@@ -169,7 +169,8 @@ public class Parser
     		line = line.replace("+-", "-");
     		if (len == line.length()) break;
     	}
-        for (String str: constants) {
+    	
+    	for (String str: constants) {
         	for (String start: before) {
         		for (String end: after) {
         			line = line.replace(start+str+end, start+"&"+str+"#0"+end);
@@ -274,6 +275,10 @@ public class Parser
 
                     if (par<=0 && isOper(expr.charAt(j)))
                     {
+                    	if (j==i+1 && (isMinus(expr.charAt(j))||isPlus(expr.charAt(j)))) {
+                    		j++;
+                    		continue inner2;
+                    	}
                         expr.insert(j, ")");
                         break inner2;
                     }
@@ -400,6 +405,10 @@ public class Parser
                     
                     if (par<=0 && isOper(expr.charAt(j)))
                     {
+                    	if (j==i+1 && (isMinus(expr.charAt(j))||isPlus(expr.charAt(j)))) {
+                    		j++;
+                    		continue inner2;
+                    	}
                         expr.insert(j, ")");
                         break inner2;
                     }
@@ -483,6 +492,17 @@ public class Parser
         String strExpr = expr.toString();
         strExpr = strExpr.replace("(-", "(0-");
         strExpr = strExpr.replace("(+", "(0+");
+        
+        boolean bad = 
+        		strExpr.contains("*)") || strExpr.contains("(*")
+        		|| strExpr.contains("/)") || strExpr.contains("(/")
+        		|| strExpr.contains("^)") || strExpr.contains("(^")
+        		|| strExpr.contains("#)") || strExpr.contains("(#")
+        		|| strExpr.contains(":)") || strExpr.contains("(:")
+        		|| strExpr.contains("-)") || strExpr.contains("+)");
+        
+        if (bad) throw new Exception();
+        
         return strExpr;
     }
 

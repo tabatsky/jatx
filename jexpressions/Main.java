@@ -32,6 +32,7 @@ public class Main {
             
             try
             {
+            	System.out.println(parser.prepareExpr(line));
             	Expr expr = parser.parseExpr(parser.prepareExpr(line));
                 double result = expr.evaluate();
                 System.out.println();
