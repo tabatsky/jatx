@@ -63,9 +63,28 @@ public class Specfun {
             System.out.print("\nargument of gamma cannot be zero or negative integer\n");
             return Double.NaN;
         }
-        if(x>1.5) return (x-1)*eulergamma(x-1);
-        if(x<0.5) return eulergamma(x+1)/x;
-        return Math.exp(lngamma(x));
+        
+        //if(x>1.5) return (x-1)*eulergamma(x-1);
+        //if(x<0.5) return eulergamma(x+1)/x;
+        
+        if (x>180) return Double.POSITIVE_INFINITY;
+        if (x<-180) {
+        	int xIntAbs = (int)(-x);
+        	int sign = 2*(xIntAbs%2)-1; 
+        	return 0.0*sign;
+        }
+        
+        double mult = 1.0;
+        while (x>1.5) {
+        	mult *= x-1;
+        	x -= 1;
+        }
+        while (x<0.5) {
+        	mult /= x;
+        	x += 1;
+        }
+  
+        return mult*Math.exp(lngamma(x));
     }
 
     public static double eulerbeta(double x,double y){
