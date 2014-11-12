@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
 	}
 	
 	class ReceiverPlayer extends Thread {
-		boolean finishFlag;
+		volatile boolean finishFlag;
 		String host;
 		
 		public ReceiverPlayer(String hostname) {

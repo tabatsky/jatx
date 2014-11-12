@@ -52,7 +52,7 @@ public class Main {
 
 	static class Sender extends Thread {
 		Socket s;
-		boolean finishFlag;
+		volatile boolean finishFlag;
 		int position;
 		int senderNumber;
 	
@@ -96,7 +96,7 @@ public class Main {
 	}
 	
 	static class MicrophoneReader extends Thread {
-		boolean finishFlag;
+		volatile boolean finishFlag;
 		
 		AudioFormat format = new AudioFormat(16000.0f, 16, 2, true, false);
 		//AudioFormat format = new AudioFormat(8000.0f, 8, 1, true, false);
