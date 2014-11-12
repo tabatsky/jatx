@@ -126,17 +126,12 @@ public class Main {
 		        		        
 		        while (!finishFlag) {
 		        	synchronized (monitor) {
-		        		if (senderNotReady==senderList.size()) {
+		        		if (senderNotReady==sendersCreated) {
 			        		monitor.notifyAll();
 			        		continue;
 		        		}
 		        		
-		        		if (senderNotReady>0) {
-		        			
-		        		}
-		        		
-		        		numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
-		        		
+		        		numBytesRead = microphone.read(data, 0, CHUNK_SIZE);	
 		        	}
 
 	        		System.out.print("Microphone reader: ");
