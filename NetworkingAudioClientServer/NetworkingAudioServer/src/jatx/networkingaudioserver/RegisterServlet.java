@@ -91,6 +91,8 @@ public class RegisterServlet extends HttpServlet {
     		registerUser.setString(4, DigestUtils.md5Hex(email));
     		registerUser.executeUpdate();
     		
+    		connect.close();
+    		
     		Runtime runtime = Runtime.getRuntime();
     		String[] command = {"/common_scripts/sendConfirm",email,confirm};
     		Process process = runtime.exec(command);

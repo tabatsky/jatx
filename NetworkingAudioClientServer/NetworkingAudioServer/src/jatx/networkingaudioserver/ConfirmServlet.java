@@ -62,8 +62,10 @@ public class ConfirmServlet extends HttpServlet {
 							+ "`confirm`='done' WHERE `confirm`=?");
 			confirmEmail.setString(1, confirm);
 			confirmEmail.executeUpdate();
-			out.println("E-mail confirmed succesfully");
 			
+			connect.close();
+			
+			out.println("E-mail confirmed succesfully");
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}

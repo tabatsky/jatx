@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -74,6 +73,8 @@ public class GetUserInfoServlet extends HttpServlet {
         	} else {
         		out.println("Error: not found");
         	}
+        	
+        	connect.close();
         } catch (Exception e) {
         	e.printStackTrace(out);
         }

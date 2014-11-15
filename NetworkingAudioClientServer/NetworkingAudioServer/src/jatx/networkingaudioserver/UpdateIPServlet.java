@@ -82,6 +82,8 @@ public class UpdateIPServlet extends HttpServlet {
     		updateIP.setString(3, ip);    		
     		updateIP.executeUpdate();
     		
+    		connect.close();
+    		
     		out.println("user_id:"+user_id);
         } catch (Exception e) {
         	e.printStackTrace(out);
