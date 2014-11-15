@@ -1,0 +1,14 @@
+#!/bin/sh
+email=$1
+confirm=$2
+SERVER_URL="http://tabatsky.ru/networkingaudio";
+TMP_FILE="/common_scripts/tmp/$confirm";
+
+echo "To: $email" > $TMP_FILE;
+echo "From: service@tabatsky.ru" >> $TMP_FILE;
+echo "Subject: Networking Audio e-mail confirmation" >> $TMP_FILE;
+echo >> $TMP_FILE;
+echo "$SERVER_URL/confirm?confirm=$confirm" >> $TMP_FILE;
+echo >> $TMP_FILE;
+
+sendmail $email < $TMP_FILE
