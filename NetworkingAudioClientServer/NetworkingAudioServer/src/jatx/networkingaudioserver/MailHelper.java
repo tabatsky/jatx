@@ -19,7 +19,7 @@ public class MailHelper {
 	static final String SERVER_URL = "http://tabatsky.ru/networkingaudio";
 	
 	static final String USER = "service@tabatsky.ru";
-	static final String PASS = "dexpp37";
+	static final String PASS = "";
 	static final String SMTP_HOST = "smtp.yandex.ru";
 	static final String SMTP_PORT = "465";
 	
