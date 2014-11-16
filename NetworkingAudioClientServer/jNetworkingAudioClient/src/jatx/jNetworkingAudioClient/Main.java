@@ -9,6 +9,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
+/**
+ * 
+ * @author jatx
+ *
+ * User interface program logic
+ */
 public class Main {
 	static InputReader ir;
 	
@@ -23,6 +29,10 @@ public class Main {
 	public static volatile boolean masterActive = false;
 	public static volatile boolean slaveActive = false;
 	
+	/* 
+	 * Asynchronously reads console input
+	 * and saves commands to queue
+	 */
 	static class InputReader extends Thread {
 		volatile Queue<String> input;
 		volatile boolean finishFlag;
@@ -50,15 +60,25 @@ public class Main {
 			return input.poll();
 		}
 		
+		/*
+		 * Emulate console input
+		 */
 		public void sendCommand(String cmd) {
 			input.offer(cmd);
 		}
  	}
 	
+	/*
+	 * Send command to InputReader
+	 */
 	static void sendCmd(String cmd) {
 		ir.sendCommand(cmd);
 	}
 	
+	/*
+	 * main thread of application
+	 * interface logic
+	 */
 	public static void main(String[] args) {
 		loginSuccess = false;
 		if (args.length>0) {
@@ -73,6 +93,10 @@ public class Main {
 		System.out.println("Using server: "+serverUrl);
 		System.out.println("ATTENTION: Redirect port 7373 if you using router");
 		
+		/*
+		 * trying to login or register
+		 * until no successful login
+		 */
 		while (!loginSuccess) {
 			System.out.println("Type 'register'|'login'|'quit'");
 			input = sc.nextLine();
@@ -81,6 +105,10 @@ public class Main {
 				email = sc.nextLine();
 				System.out.println("Type your password:");
 				password = sc.nextLine();
+				/*
+				 * get request
+				 * to register servlet:
+				 */
 				String url = serverUrl+"register?email="+email+"&password="+password;
 				try {
 					Scanner urlGetter = new Scanner(new URL(url).openStream(), "UTF-8");
@@ -98,12 +126,21 @@ public class Main {
 				email = sc.nextLine();
 				System.out.println("Type your password:");
 				password = sc.nextLine();
+				/* 
+				 * get request
+				 * to IP update servlet:
+				 */
 				String url = serverUrl+"updateip?email="+email+"&password="+password;
 				try {
 					Scanner urlGetter = new Scanner(new URL(url).openStream(), "UTF-8");
 					while (urlGetter.hasNextLine()) {
 						input = urlGetter.nextLine();
 						if (input.startsWith("user_id:")) {
+							/*
+							 * if servlet returns user_id
+							 * then login successful
+							 * and loop finished
+							 */
 							user_id = input.replace("user_id:", "");
 							loginSuccess = true;
 							System.out.println("Logged in successfully");
@@ -118,19 +155,34 @@ public class Main {
 					e.printStackTrace(System.err);
 				}
 			} else if (input.equals("quit")) {
+				/*
+				 * close application on 'quit' command
+				 */
 				return;
 			}
 		}
 		
+		/*
+		 * starting IPUpdater:
+		 */
 		IPUpdater ipupd = new IPUpdater(serverUrl,email,password);
 		ipupd.start();
+		/*
+		 * starting Master:
+		 */
 		Master.listenStart();
+		/*
+		 * starting InputReader:
+		 */
 		ir = new InputReader(sc);
 		ir.start();
 		
 		boolean waitInput = false;
 		input = null;
 		
+		/*
+		 * main loop:
+		 */
 loop:	while (true) {
 			try {
 				Thread.sleep(100);
@@ -138,19 +190,33 @@ loop:	while (true) {
 				e.printStackTrace();
 			}
 	
+			/*
+			 * you may only make call or quit app
+			 * if no active Slave exists:
+			 */
 			if (slave==null) {
 				if (!waitInput) {
 					System.out.println("Type 'call'|'quit'");
 				}
 			}
 			
+			/* 
+			 * if Slave exists:
+			 */
 			if (slave!=null) {
+				/*
+				 * delete Slave if it canceled:
+				 */
 				if (slave.isCanceled()) {
 					slave = null;
 					continue;
 				}
 				
-
+				/*
+				 * if both Master and Slave became active
+				 * then call successfully started
+				 * and we may reset 'active' flags:
+				 */
 				if (masterActive&&slaveActive) {
 					masterActive = false;
 					slaveActive = false;
@@ -158,18 +224,34 @@ loop:	while (true) {
 					waitInput = false;
 				}
 				
+				/*
+				 * Print prompt
+				 * if app is not waiting for input:
+				 */
 				if (!waitInput) {
 					System.out.println("Type 'cancel'|'quit'");
 				}
 				
+				/*
+				 * read input from console:
+				 */
 				input = ir.getInput();
 				if (input==null) {
+					/*
+					 * wait if no input:
+					 */
 					waitInput = true;
 				} else if (!(input.equals("cancel")||input.equals("quit"))) {
+					/*
+					 * continue if command is correct:
+					 */
 					waitInput = false;
 					continue;
 				} 
 				if (input!=null&&input.equals("cancel")) {
+					/*
+					 * cancel call:
+					 */
 					waitInput = false;
 					slave.setCancelFlag();
 					slave.interrupt();
@@ -178,35 +260,63 @@ loop:	while (true) {
 				}
 				
 				if (input!=null&&input.equals("quit")) {
+					/*
+					 * exit app:
+					 */
 					System.exit(0);
 				}
 			}
 			
+			/*
+			 * read input from console:
+			 */
 			input = ir.getInput();
 			
-			if (input==null) { 
+			if (input==null) {
+				/*
+				 * wait if no input:
+				 */
 				waitInput = true;
 			} else if (!(input.equals("call")||input.equals("quit"))) {
+				/*
+				 * continue if command is correct:
+				 */
 				waitInput = false;
 				continue;
 			}
 			
 			if (input!=null&&input.equals("quit")) {
+				/*
+				 * exit app:
+				 */
 				System.exit(0);
 			}
 			
 			if (input!=null&&input.equals("call")) {
+				/*
+				 * init call:
+				 */
 				waitInput = false;
 				
-				//Master.setCallerId("waiting");
 				System.out.println("Type target email:");
+				/*
+				 * wait target e-mail from input:
+				 */
 				do {
 					input = ir.getInput();
 				} while (input==null);
 				String target_email = input;
 				
+				/*
+				 * get target user info by email -
+				 * user_id and current IP:
+				 */
 				String[] userInfo = getUserInfo(target_email,null);
 				
+				/*
+				 * continue main loop
+				 * if cannot get user info from server:
+				 */
 				if (userInfo==null) {
 					System.out.println("Cannot get user info");
 					continue;
@@ -215,11 +325,25 @@ loop:	while (true) {
 				if (userInfo[2].equals("offline")) {
 					System.out.println("User "+target_email+" is offline");
 				} else {
+					/*
+					 * if user online:
+					 */
 					InetAddress ipAddr;
 					try {
+						/*
+						 * resolve IP address:
+						 */
 						ipAddr = InetAddress.getByName(userInfo[2]);
+						/*
+						 * create and start new Slave:
+						 */
 						slave = new Slave(ipAddr, user_id);
 						slave.start();
+						/*
+						 * force Master
+						 * to receive calls
+						 * only from target user:
+						 */
 						Master.setCallerId(userInfo[1]);
 					} catch (UnknownHostException e) {
 						System.out.println("Error: unknown IP");
@@ -228,7 +352,14 @@ loop:	while (true) {
 				}
 			}
 
+			/*
+			 * Master has incoming call request,
+			 * waiting accept or decline from user: 
+			 */
 			if (Master.getCallerId()!=null&&!Master.isBusy()) {
+				/*
+				 * resolve remote user e-mail and IP by received user_id:
+				 */
 				String[] userInfo = getUserInfo(null,Master.getCallerId());
 				
 				if (userInfo==null) {
@@ -238,10 +369,19 @@ loop:	while (true) {
 				
 				System.out.println(userInfo[0]+" is calling. Accept? 'Y'|'N'");
 wait_master:	while (true) {
+					/*
+					 * remote user canceled call,
+					 * no need to wait any more,
+					 * continue main loop:
+					 */
 					if (Master.getCallerId()==null) {
 						continue loop;
 					}
 					input = ir.getInput();
+					/*
+					 * waiting until user inputs 'Y' or 'N'
+					 * to accept or decline incoming call:
+					 */
 					if (input==null) continue wait_master;
 					if (input.equals("Y")) {
 						Master.accept(Master.ACCEPT);
@@ -259,12 +399,21 @@ wait_master:	while (true) {
 					}
 				}
 				
+				/* 
+				 * check if remote user still online:
+				 */
 				if (userInfo[2].equals("offline")) {
 					System.out.println("User "+userInfo[0]+" is offline");
 				} else {
 					InetAddress ipAddr;
 					try {
+						/*
+						 * resolve IP address:
+						 */
 						ipAddr = InetAddress.getByName(userInfo[2]);
+						/*
+						 * create and start new Slave:
+						 */
 						slave = new Slave(ipAddr, user_id);
 						slave.start();
 					} catch (UnknownHostException e) {
@@ -276,12 +425,21 @@ wait_master:	while (true) {
 		}
 	}
 	
+	/* 
+	 * resolves user info by e-mail or user id
+	 */
 	static String[] getUserInfo(String target_email, String target_user_id) {
 		try {
 			String url = null;
 			if (target_email!=null) {
+				/*
+				 * resolve by e-mail:
+				 */
 				url = serverUrl+"getuserinfo?email="+target_email;
 			} else if (target_user_id!=null) {
+				/*
+				 * resolve by user-id:
+				 */
 				url = serverUrl+"getuserinfo?user_id="+target_user_id;
 			} else {
 				return null;
@@ -291,6 +449,9 @@ wait_master:	while (true) {
 			
 			String input = null;
 			
+			/* 
+			 * make get request to servlet:
+			 */
 			Scanner urlGetter = new Scanner(new URL(url).openStream(), "UTF-8");
 			
 			while (urlGetter.hasNextLine()) {

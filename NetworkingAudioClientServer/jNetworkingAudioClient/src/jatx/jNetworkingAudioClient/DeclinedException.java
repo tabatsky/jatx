@@ -1,5 +1,13 @@
 package jatx.jNetworkingAudioClient;
 
+/**
+ * 
+ * @author jatx
+ *
+ * This exception is thrown 
+ * when you or remote user
+ * declined or canceled call
+ */
 public class DeclinedException extends Exception {
 	String message;
 	

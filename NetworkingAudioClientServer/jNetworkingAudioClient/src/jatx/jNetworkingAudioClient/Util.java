@@ -2,6 +2,13 @@ package jatx.jNetworkingAudioClient;
 
 import javax.sound.sampled.AudioFormat;
 
+/**
+ * 
+ * @author jatx
+ *
+ * Accessorial class
+ * Keeps some constants
+ */
 public class Util {
 	public static final int CHUNK_SIZE = 2048;
 	public static final boolean DEBUG = false;

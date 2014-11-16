@@ -13,6 +13,15 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+/**
+ * 
+ * @author jatx
+ *
+ * This class initiates call
+ * Sends user_id (md5 of email) to remote user
+ * Receives data from remote user 
+ * and writes it to speakers if call is accepted
+ */
 public class Slave extends Thread {
 	String my_id;
 	InetAddress ipAddr;
@@ -42,24 +51,40 @@ public class Slave extends Thread {
 	
 	public void run() {
 		try {
+			/*
+			 * init connection to remote user:
+			 */
 			s = new Socket(ipAddr, 7373);
 			
+			/*
+			 * send md5-hash to remote user:
+			 */
 			os = s.getOutputStream();
 			byte[] md5 = my_id.getBytes("US-ASCII");
 			os.write(md5);
 			os.flush();
-			//s.shutdownOutput();
 			
 			is = s.getInputStream();
 			
+			/*
+			 * init speakers:
+			 */
 			DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, Util.getAudioFormat());
 	        speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
 	        speakers.open(Util.getAudioFormat());
 	        speakers.start();
 			
-			
+			/*
+			 * create buffer:
+			 */
 	        byte[] data = new byte[Util.CHUNK_SIZE*25];
 				        
+	        /*
+	         * loop running until user not canceled call
+	         * or one byte from remote user received
+	         * trying to read one byte 
+	         * and sending 0(0x00) byte to remote user:
+	         */
 	        while(!cancelFlag) {
 	        	if (is.available()>0&&is.read(data, 0, 1)==1) {
 	    	        break;
@@ -77,15 +102,27 @@ public class Slave extends Thread {
 	        byte first = data[0];
 	        
 	        if (cancelFlag) {
+	        	/*
+	        	 * call canceled by user from main thread
+	        	 * sends 127(0xFF) byte to remote user
+	        	 * and throws exception
+	        	 */
 	        	byte[] tmp = new byte[]{(byte)127};
 				os.write(tmp);
 				os.flush();
 				throw new DeclinedException("Call canceled by you");
 	        } else if (first==(byte)0) {
-	        	//System.out.println("Call accepted by remote user");
-	        	//System.out.println("Type 'breakup'|'quit'");
+	        	/*
+	        	 * call accepted by remote user
+	        	 * sets 'active' flag for Slave
+	        	 */
 	        	Main.slaveActive = true;
 	        } else if (first==(byte)127) {
+	        	/*
+	        	 * call declined by remote user
+	        	 * sends command to InputReader
+	        	 * and throws Exception:
+	        	 */
 	        	Main.sendCmd(Util.EMPTY_CMD);
 	        	throw new DeclinedException("Call declined by remote user");
 	        }
@@ -94,15 +131,31 @@ public class Slave extends Thread {
 	        
 	        boolean startedFlag = false;
 	        
+	        /*
+	         * main loop
+	         * running while Slave not canceled or interrupted:
+	         */
 	        while(!cancelFlag) {
 				numBytesRead = is.read(data);
+				
+				/*
+				 * if some data received from remote user
+				 * write it to speakers
+				 */
 				if (numBytesRead>0) speakers.write(data, 0, numBytesRead);
 				
+				/*
+				 * if call started:
+				 */
 				if (!startedFlag&&numBytesRead>0) {
 					startedFlag = true;
-					//s.setSoTimeout(1500);
 				}
 				
+				/*
+				 * send command to InputReader
+				 * and throw Exception
+				 * if InputStream from socket finished:
+				 */
 				if (startedFlag&&numBytesRead==-1) {
 					Main.sendCmd(Util.EMPTY_CMD);
 					throw new DeclinedException("Call canceled by remote user");
