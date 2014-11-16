@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -93,15 +94,9 @@ public class RegisterServlet extends HttpServlet {
     		
     		connect.close();
     		
-    		Runtime runtime = Runtime.getRuntime();
-    		String[] command = {"/common_scripts/sendConfirm",email,confirm};
-    		Process process = runtime.exec(command);
-			int exitCode = process.waitFor();
-			if (exitCode==0) {
-				out.println("Check your email for confirmation");
-			} else {
-				out.println("Error sending email");
-			}
+    		out.println(MailHelper.sendMail(email, confirm));
+		} catch (MessagingException e) {
+			out.println("Error while sending e-mail");
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}
