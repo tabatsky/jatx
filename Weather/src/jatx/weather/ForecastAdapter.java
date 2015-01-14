@@ -5,15 +5,11 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,69 +27,32 @@ public class ForecastAdapter extends BaseAdapter {
 	final static String KEY_DESC = "description";
 	
 	private WeatherDBHelper mDBHelper;
-	private SQLiteDatabase db;
 	private Context mContext;
 	
-	private List<String> mDateList;
-	private List<Double> mTempList;
-	private List<Double> mPressureList;
-	private List<Long> mHumidityList;
-	private List<String> mDescList;
+	private List<WeatherEntry> weatherList;
 	
 	private Long mCityId;
 	
 	public ForecastAdapter(Context context, Long city_id) {
 		mCityId = city_id;
 		mContext = context;
-		mDBHelper = new WeatherDBHelper(mContext);
-		db = mDBHelper.getReadableDatabase();
+		mDBHelper = WeatherDBHelper.getInstance(mContext);
 		
-		mDateList = new ArrayList<String>();
-		mTempList = new ArrayList<Double>();
-		mPressureList = new ArrayList<Double>();
-		mHumidityList = new ArrayList<Long>();
-		mDescList = new ArrayList<String>();
-		
-		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM weather WHERE city_id=");
-		query.append(mCityId.toString());
-		query.append(" AND dt_txt>'");
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.add(Calendar.HOUR_OF_DAY, -3);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		df.setTimeZone(TimeZone.getTimeZone("UTC"));
-		query.append(df.format(calendar.getTime()));
-		query.append("' ORDER BY dt_txt");
-		Cursor cursor = db.rawQuery(query.toString(), null);
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			String dt_txt = cursor.getString(cursor.getColumnIndex(KEY_DT_TXT));
-			mDateList.add(dt_txt);
-			Double temp = cursor.getDouble(cursor.getColumnIndex(KEY_TEMP));
-			mTempList.add(temp);
-			Double pressure = cursor.getDouble(cursor.getColumnIndex(KEY_PRESSURE));
-			mPressureList.add(pressure);
-			Long humidity = cursor.getLong(cursor.getColumnIndex(KEY_HUMIDITY));
-			mHumidityList.add(humidity);
-			String desc = cursor.getString(cursor.getColumnIndex(KEY_DESC));
-			mDescList.add(desc);
-			
-			cursor.moveToNext();
-		}
-		cursor.close();
-		db.close();
+		weatherList = mDBHelper.getWeatherList(city_id);
 	}
 	
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return mDateList.size();
+		//return mDBHelper.getWeatherEntryCount(mCityId);
+		return weatherList.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
 		// TODO Auto-generated method stub
-		return null;
+		//return mDBHelper.getWeatherEntry(mCityId, (long)position);
+		return weatherList.get(position);
 	}
 
 	@Override
@@ -109,9 +68,12 @@ public class ForecastAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.forecast_entry, null);
         }
 		
+		//WeatherEntry we = mDBHelper.getWeatherEntry(mCityId, (long)position);
+		WeatherEntry we = weatherList.get(position);
+		
 		TextView forecastEntryInfo = (TextView)convertView.findViewById(R.id.forecastEntryInfo);
 		
-		String dt_txt = mDateList.get(position);
+		String dt_txt = we.dt_txt;
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		try {
@@ -123,19 +85,19 @@ public class ForecastAdapter extends BaseAdapter {
 			Log.e("error", "date parse error");
 		}
 		
-		Double temp = mTempList.get(position);
+		Double temp = we.temp;
 		NumberFormat formatter = new DecimalFormat("+#0.0;-#0.0"); 
 		String temp_str = formatter.format(temp);
-		Double pressure = mPressureList.get(position);
+		Double pressure = we.pressure;
 		NumberFormat formatter2 = new DecimalFormat("##0.0");
 		String pressure_str = formatter2.format(pressure);
-		Long humidity = mHumidityList.get(position);
-		String desc = mDescList.get(position);
+		Long humidity = we.humidity;
+		String desc = we.description;
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(dt_txt).append(" | ");
 		sb.append(temp_str).append("\u00b0").append("C | ");
-		sb.append(pressure_str).append("mmHg | ");
+		sb.append(pressure_str).append(" мм.рт.ст. | ");
 		sb.append(humidity).append("% | ");
 		sb.append(desc);
 		

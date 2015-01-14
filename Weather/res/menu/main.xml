@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:yourapp="http://schemas.android.com/apk/res-auto"
+>
+
+    <item 
+        android:id="@+id/refresh"  
+        android:icon="@drawable/ic_refresh"
+        android:title="" 
+        yourapp:showAsAction="always">
+  	</item> 
+  	
+    <item 
+        android:id="@+id/add_city"  
+        android:icon="@drawable/ic_plus"
+        android:title="" 
+        yourapp:showAsAction="always">
+  	</item> 
+    
+  	<item 
+        android:id="@+id/open_settings"  
+        android:icon="@drawable/ic_settings"
+        android:title="" 
+        yourapp:showAsAction="always">
+  	</item>  
+
+</menu>
