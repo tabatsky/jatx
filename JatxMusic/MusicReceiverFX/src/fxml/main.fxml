@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox 
+	id="main_pane"
+	stylesheets="/css/main.css"
+	xmlns:fx="http://javafx.com/fxml/1" 
+	xmlns="http://javafx.com/javafx/2.2">
+	
+	<TextField id="host_field" text="127.0.0.1" />
+	
+	<Button id="toogle_button" text="Start" />
+	
+	<CheckBox id="auto_connect" text="Auto Connect" />
+
+</VBox>
+

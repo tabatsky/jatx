@@ -1,0 +1,41 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+#main_pane {
+	-fx-pref-width: 360.0;
+	-fx-pref-height: 640.0;
+}
+
+#my_list {
+	-fx-pref-width:360.0;
+	-fx-pref-height:550.0;
+}
+
+#menu_pane_top {
+	-fx-pref-width:360.0;
+	-fx-pref-height:30.0;
+}
+
+#button_pane_bottom {
+	-fx-pref-width:360.0;
+	-fx-pref-height:60.0;
+}
+
+.my_button_bottom {
+	-fx-pref-width:60.0;
+	-fx-pref-height:60.0;
+	-fx-background-color:#fff;
+	-fx-border-width:0.0;
+	-fx-border-radius:0.0;
+	-fx-border-color:#000;
+}
+
+#vol_label {
+	-fx-pref-width:120.0;
+	-fx-pref-height:60.0;
+	-fx-font-size:25.0;
+	-fx-alignment:center;
+	-fx-background-color:#fff;
+	-fx-border-width:0.0;
+	-fx-border-radius:0.0;
+	-fx-border-color:#000;
+}

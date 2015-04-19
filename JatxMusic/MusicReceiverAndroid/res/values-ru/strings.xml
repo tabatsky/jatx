@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Music Receiver</string>
+    
+    <string name="string_start">Старт</string>
+    <string name="string_stop">Стоп</string>
+    <string name="string_auto_connect">Авто-подключение</string>
+    
+    <string name="toast_disconnect">Соединение разорвано</string>
+
+</resources>

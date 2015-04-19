@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Music Transmitter</string>
+    
+    <string name="string_add">Добавить</string>
+    <string name="string_add_track">Добавить трек</string>
+    <string name="string_add_folder">Добавить папку</string>
+	<string name="string_remove">Удалить</string>
+	<string name="string_remove_track">Удалить трек</string>
+	<string name="string_remove_all">Удалить всё</string>
+	<string name="string_playlist">Плейлист</string>
+	<string name="string_export_m3u8">Сохранить в M3U8</string>
+	<string name="string_import_m3u8">Загрузить из M3U8</string>
+	
+	<string name="question_remove_track">Удалить этот трек?</string>
+	<string name="question_remove_all">Удалить все треки?</string>
+	
+	<string name="yes">Да</string>
+	<string name="no">Нет</string>
+	
+	<string name="toast_m3u8_ext">Файл должен иметь расширение m3u8</string>
+	<string name="toast_long_tap">Сделайте долгое нажатие на треке, чтобы удалить</string>
+</resources>
+

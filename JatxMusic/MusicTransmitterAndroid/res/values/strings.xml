@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Music Transmitter</string>
+    
+    <string name="string_add">Add</string>
+    <string name="string_add_track">Add Track</string>
+    <string name="string_add_folder">Add Folder</string>
+	<string name="string_remove">Remove</string>
+	<string name="string_remove_track">Remove Track</string>
+	<string name="string_remove_all">Remove All</string>
+	<string name="string_playlist">Playlist</string>
+	<string name="string_export_m3u8">Export M3U8</string>
+	<string name="string_import_m3u8">Import M3U8</string>
+	
+	<string name="question_remove_track">Remove This Track?</string>
+	<string name="question_remove_all">Remove All Tracks?</string>
+	
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	
+	<string name="toast_m3u8_ext">Playlist file must have m3u8 extension</string>
+	<string name="toast_long_tap">Make long tap on track to remove</string>
+</resources>

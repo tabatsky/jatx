@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:yourapp="http://schemas.android.com/apk/res-auto"
+>
+	<item 
+        android:id="@+id/item_menu_add"
+        android:title="@string/string_add"
+        android:visible="true" 
+        yourapp:showAsAction="always|withText">
+        <menu>
+        	<group>
+	    		<item android:id="@+id/item_menu_add_track" android:title="@string/string_add_track"></item>
+	    		<item android:id="@+id/item_menu_add_folder" android:title="@string/string_add_folder"></item>
+	    	</group>
+	    </menu>
+	</item>
+	
+    <item 
+        android:id="@+id/item_menu_remove"
+        android:title="@string/string_remove" 
+        android:visible="true" 
+        yourapp:showAsAction="always|withText">
+        <menu>
+        	<group>
+        	    <item android:id="@+id/item_menu_remove_track" android:title="@string/string_remove_track"></item>
+	    		<item android:id="@+id/item_menu_remove_all" android:title="@string/string_remove_all"></item>
+	    	</group>
+	    </menu>
+    </item>
+    
+    <item 
+        android:id="@+id/item_menu_playlist"
+        android:title="@string/string_playlist"
+        android:visible="true" 
+        yourapp:showAsAction="always|withText">
+        <menu>
+        	<group>
+	    		<item android:id="@+id/item_menu_export_m3u8" android:title="@string/string_export_m3u8"></item>
+	    		<item android:id="@+id/item_menu_import_m3u8" android:title="@string/string_import_m3u8"></item>
+	    	</group>
+	    </menu>
+    </item>    
+        
+</menu>

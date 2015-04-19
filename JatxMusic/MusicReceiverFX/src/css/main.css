@@ -1,0 +1,27 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+#main_pane {
+	-fx-pref-width: 240.0;
+	-fx-pref-height: 240.0;
+}
+
+#host_field {
+	-fx-pref-width: 240.0;
+	-fx-pref-height: 80.0;
+	-fx-alignment: center;
+	-fx-font-size: 25.0;
+}
+
+#toogle_button {
+	-fx-pref-width: 240.0;
+	-fx-pref-height: 80.0;
+	-fx-font-size: 25.0;
+}
+
+#auto_connect {
+	-fx-pref-width: 240.0;
+	-fx-pref-height: 80.0;
+	-fx-alignment: center;
+	-fx-font-size: 20.0;
+	-fx-padding: 12.0;
+}

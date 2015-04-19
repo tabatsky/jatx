@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    
+    <dimen name="button_size">50dp</dimen>
+    <dimen name="volume_label_width">100dp</dimen>
+    <dimen name="song_label_height">65dp</dimen>
+
+    <dimen name="volume_label_text">25dp</dimen>
+    <dimen name="song_label_text">14dp</dimen>
+    
+    <dimen name="song_entry_title">20dp</dimen>
+    <dimen name="song_entry_artist">15dp</dimen>
+    
+</resources>
