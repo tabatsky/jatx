@@ -31,7 +31,7 @@ package jatx.testtaskandroid;
 
 // total test task time: 5h 20min
 
-import jatx.utils.Debug;
+//import jatx.utils.Debug;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -113,7 +113,7 @@ public class MainActivity extends ActionBarActivity implements
 		
 		self = this;
 		
-		Debug.setCustomExceptionHandler(getApplicationContext());
+		//Debug.setCustomExceptionHandler(getApplicationContext());
 		
 		AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
