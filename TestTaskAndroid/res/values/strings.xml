@@ -11,6 +11,7 @@
     <string name="string_show_rating">Смотреть рейтинг</string>
     
     <string name="toast_no_vk">Приложение ВКонтакте не установлено</string>
+    <string name="toast_vk_success">Опубликовано ВКонтакте успешно</string>
     <string name="toast_error_internet">Ошибка соединения с сервером</string>
     <string name="toast_error_google">Ошибка подключения к сервисам Google</string>
     

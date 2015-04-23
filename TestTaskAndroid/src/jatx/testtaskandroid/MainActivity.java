@@ -39,8 +39,6 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import com.google.android.gms.ads.AdRequest;
@@ -49,6 +47,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.VKSdkListener;
+import com.vk.sdk.VKUIHelper;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
 
 import android.support.v7.app.ActionBarActivity;
 import android.animation.Animator;
@@ -57,7 +63,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
-import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -74,6 +79,7 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity implements 
 			GoogleApiClient.ConnectionCallbacks, 
 			GoogleApiClient.OnConnectionFailedListener{
+	private static final String[] scope = {"wall"};
 	
 	private static final int REQUEST_RESOLUTION = 579;
 	private static final int REQUEST_SHOW_SCORE = 975;
@@ -150,7 +156,7 @@ public class MainActivity extends ActionBarActivity implements
 		mRusWord2Button.setOnClickListener(new RadioListener(2));
 		mRusWord3Button.setOnClickListener(new RadioListener(3));
 		
-		mVKShareButton.setOnClickListener(new View.OnClickListener() {
+		/*mVKShareButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				 final String vkPackage = "com.vkontakte.android";
@@ -186,6 +192,13 @@ public class MainActivity extends ActionBarActivity implements
 			    	Toast.makeText(self, getString(R.string.toast_no_vk), Toast.LENGTH_LONG).show();
 			    }
 			}
+		});*/
+		
+		mVKShareButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				vkInitAndPost();
+			}
 		});
 		
 		mShowRatingButton.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +223,22 @@ public class MainActivity extends ActionBarActivity implements
 					.build();
 	}
 
+	@Override 
+	protected void onResume() { 
+		Log.i("test task", "on resume");
+		
+		super.onResume(); 
+		VKUIHelper.onResume(this); 
+	} 
+
+	@Override 
+	protected void onDestroy() { 
+		Log.i("test task", "on destroy");
+		
+		super.onDestroy(); 
+		VKUIHelper.onDestroy(this); 
+	} 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -228,6 +257,7 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		VKUIHelper.onActivityResult(this, requestCode, resultCode, intent); 
 		
 		if (requestCode==REQUEST_RESOLUTION&&resultCode==RESULT_OK) {
 			mGoogleApiClient.connect();
@@ -381,6 +411,65 @@ public class MainActivity extends ActionBarActivity implements
 		}
  	}
 	
+	private void vkInitAndPost() {
+		VKSdkListener listener = new VKSdkListener(){
+			@Override
+			public void onAccessDenied(VKError error) {
+				Log.i("listener", "access denied");
+			}
+
+			@Override
+			public void onCaptchaError(VKError error) {
+				Log.i("listener", "captcha error");
+			}
+
+			@Override
+			public void onTokenExpired(VKAccessToken token) {
+				Log.i("listener", "token expired");
+			}
+			
+			@Override 
+			public void onReceiveNewToken(VKAccessToken token) {
+				Log.i("listener", "new token received");
+				
+				VKSdk.setAccessToken(token, true);
+				
+				VKSdk.wakeUpSession();
+				
+				if (VKSdk.isLoggedIn()) {
+					Log.i("vk", "logged in");
+					postToVKWall();
+				} else {
+					Log.i("vk", "logged out");
+				}
+			}
+		};
+
+		VKSdk.initialize(listener, "4889698");
+		VKUIHelper.onCreate(this);
+		
+		VKSdk.authorize(scope);
+	}
+	
+	private void postToVKWall() {
+		VKParameters param = new VKParameters();
+		String msg = getString(R.string.string_vk_score);
+		msg = msg.replace("SSS", Integer.toString(mScore*10));
+		param.put("message", msg);
+		VKRequest request = new VKRequest("wall.post", param);
+		request.executeWithListener(new VKRequest.VKRequestListener() {
+			@Override
+            public void onComplete(VKResponse response) {
+				Toast.makeText(self, getString(R.string.toast_vk_success), Toast.LENGTH_LONG).show();
+			}
+			
+			@Override
+			public void onError(VKError e) {
+				Log.e("vk error", e.toString());
+			}
+		});
+	}
+	
 	private class RadioListener implements View.OnClickListener {
 		private int mNum;
 		
@@ -488,4 +577,6 @@ public class MainActivity extends ActionBarActivity implements
 			return true;
 		}
 	}
+	
+	
 }
