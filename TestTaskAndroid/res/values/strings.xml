@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TestTaskAndroid</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    
+    <string name="string_score">Набрано очков: SSS/TTT</string>
+    <string name="string_vk_score">Ура! Я набрал SSS очков в приложении \"Тест на знание английского\"</string>
+    <string name="string_vk_share">Поделиться ВКонтакте</string>
+    <string name="string_show_rating">Смотреть рейтинг</string>
+    
+    <string name="toast_no_vk">Приложение ВКонтакте не установлено</string>
+    <string name="toast_error_internet">Ошибка соединения с сервером</string>
+    <string name="toast_error_google">Ошибка подключения к сервисам Google</string>
+    
+    <string-array name="eng_words">
+        <item>House</item>
+        <item>Dog</item>
+        <item>Apple</item>
+        <item>Book</item>
+        <item>Light</item>
+        <item>Rain</item>
+        <item>Shoes</item>
+        <item>Big</item>
+        <item>Good</item>
+        <item>Fire</item>
+    </string-array>
+
+    <string-array name="rus_words_1">
+        <item>Дом</item>
+        <item>Кошка</item>
+        <item>Апельсин</item>
+        <item>Книга</item>
+        <item>Газ</item>
+        <item>Снег</item>
+        <item>Ботинки</item>
+        <item>Маленький</item>
+        <item>Плохой</item>
+        <item>Огонь</item>
+    </string-array>
+    
+    <string-array name="rus_words_2">
+        <item>Город</item>
+        <item>Собака</item>
+        <item>Ананас</item>
+        <item>Газета</item>
+        <item>Свет</item>
+        <item>Туман</item>
+        <item>Брюки</item>
+        <item>Большой</item>
+        <item>Храбрый</item>
+        <item>Молния</item>
+    </string-array>
+    
+    <string-array name="rus_words_3">
+        <item>Небо</item>
+        <item>Дикобраз</item>
+        <item>Яблоко</item>
+        <item>Журнал</item>
+        <item>Тепло</item>
+        <item>Дождь</item>
+        <item>Очки</item>
+        <item>Низкий</item>
+        <item>Хороший</item>
+        <item>Взрыв</item>
+    </string-array>
+</resources>
