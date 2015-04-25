@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="eng_words">
+        <item>House</item>
+        <item>Dog</item>
+        <item>Apple</item>
+        <item>Book</item>
+        <item>Light</item>
+        <item>Rain</item>
+        <item>Shoes</item>
+        <item>Big</item>
+        <item>Good</item>
+        <item>Fire</item>
+    </string-array>
+
+    <string-array name="rus_words_1">
+        <item>Дом</item>
+        <item>Кошка</item>
+        <item>Апельсин</item>
+        <item>Книга</item>
+        <item>Газ</item>
+        <item>Снег</item>
+        <item>Ботинки</item>
+        <item>Маленький</item>
+        <item>Плохой</item>
+        <item>Огонь</item>
+    </string-array>
+    
+    <string-array name="rus_words_2">
+        <item>Город</item>
+        <item>Собака</item>
+        <item>Ананас</item>
+        <item>Газета</item>
+        <item>Свет</item>
+        <item>Туман</item>
+        <item>Брюки</item>
+        <item>Большой</item>
+        <item>Храбрый</item>
+        <item>Молния</item>
+    </string-array>
+    
+    <string-array name="rus_words_3">
+        <item>Небо</item>
+        <item>Дикобраз</item>
+        <item>Яблоко</item>
+        <item>Журнал</item>
+        <item>Тепло</item>
+        <item>Дождь</item>
+        <item>Очки</item>
+        <item>Низкий</item>
+        <item>Хороший</item>
+        <item>Взрыв</item>
+    </string-array>
+</resources>
