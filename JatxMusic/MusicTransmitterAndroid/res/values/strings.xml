@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Music Transmitter</string>
+    <string name="app_name">JatxMusic Transmitter</string>
     
     <string name="string_add">Add</string>
     <string name="string_add_track">Add Track</string>

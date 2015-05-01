@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Scanner;
 
 import jatx.musiccommons.transmitter.Globals;
+import jatx.musiccommons.transmitter.JLayerMp3Decoder;
+import jatx.musiccommons.transmitter.Mp3Decoder;
+import jatx.musiccommons.transmitter.TimeUpdater;
 import jatx.musiccommons.transmitter.TrackInfo;
 import jatx.musiccommons.transmitter.TransmitterController;
 import jatx.musiccommons.transmitter.TransmitterPlayer;
@@ -44,6 +47,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.TextView;
@@ -67,14 +71,19 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	private ListView mListView;
 	private ImageButton mPlayButton;
 	private ImageButton mPauseButton;
+	private ImageButton mRevButton;
+	private ImageButton mFwdButton;
 	private ImageButton mVolDownButton;
 	private ImageButton mVolUpButton;
 	private TextView mVolLabel;
 	private ImageView mWifiOkIcon;
 	private ImageView mWifiNoIcon;
+	private ProgressBar mProgressBar;
 	
 	private volatile WifiManager mWifiManager;
 	private volatile WifiLock mLock;
+	
+	private int mCurrentPosition = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +105,17 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 		mAdapter = new TrackListAdapter(this);
 		
 	    mListView = (ListView)findViewById(R.id.list);
+	    mPlayButton = (ImageButton)findViewById(R.id.play);
+	    mPauseButton = (ImageButton)findViewById(R.id.pause);
+	    mRevButton = (ImageButton)findViewById(R.id.rev);
+	    mFwdButton = (ImageButton)findViewById(R.id.fwd);
+	    mVolDownButton = (ImageButton) findViewById(R.id.vol_down);
+	    mVolUpButton = (ImageButton) findViewById(R.id.vol_up);
+	    mVolLabel = (TextView) findViewById(R.id.vol_label);
+	    mWifiOkIcon = (ImageView) findViewById(R.id.wifi_ok);
+	    mWifiNoIcon = (ImageView) findViewById(R.id.wifi_no);
+	    mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+	    
 	    mListView.setAdapter(mAdapter);
 	    
 	    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -103,6 +123,7 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				mPlayButton.performClick();
+				mCurrentPosition = position;
 				Globals.tp.setPosition(position);
 			}
 		});
@@ -117,12 +138,16 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			}
 		});
 	    
-	    mPlayButton = (ImageButton)findViewById(R.id.play);
-	    mPauseButton = (ImageButton)findViewById(R.id.pause);
-	    
 	    mPlayButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (mFileList.size()==0) {
+					return;
+				} else if (mCurrentPosition==-1) {
+					Globals.tp.setPosition(0);
+	        		setPosition(0);
+				}
+				
 				mPlayButton.setVisibility(View.GONE);
 				mPauseButton.setVisibility(View.VISIBLE);
 				Globals.tp.play();
@@ -140,10 +165,6 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			}
 		});
 	    
-	    mVolDownButton = (ImageButton) findViewById(R.id.vol_down);
-	    mVolUpButton = (ImageButton) findViewById(R.id.vol_up);
-	    mVolLabel = (TextView) findViewById(R.id.vol_label);
-	    
 	    mVolDownButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -151,6 +172,41 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 				mVolLabel.setText(Globals.volume.toString()+"%");
 				Globals.tc.setVolume(Globals.volume);
 				saveSettings();
+			}
+		});
+	    
+	    mFwdButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mFileList.size()==0) return;
+				
+				final int newPosition = (mCurrentPosition+1)%mFileList.size();
+				
+        		mPlayButton.performClick();
+				
+        		Globals.tp.setPosition(newPosition);
+			}
+		});
+	    
+	    mRevButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mFileList.size()==0) return;
+				
+				final int newPosition;
+				
+				if (mCurrentPosition>0) {
+					newPosition = mCurrentPosition - 1;
+				} else {
+					newPosition = mFileList.size() - 1;
+				}
+				
+				mPlayButton.performClick();
+				
+        		Globals.tp.play();
+				Globals.tc.play();
+        		
+        		Globals.tp.setPosition(newPosition);
 			}
 		});
 	    
@@ -164,9 +220,8 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			}
 		});
 	    
-	    mWifiOkIcon = (ImageView) findViewById(R.id.wifi_ok);
-	    mWifiNoIcon = (ImageView) findViewById(R.id.wifi_no);
-	    
+	    mProgressBar.setMax(1000);
+	    mProgressBar.setProgress(0);
 
 		mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		mLock = mWifiManager.createWifiLock("music transmitter wifi lock");
@@ -194,6 +249,7 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	protected void onDestroy() {
 		Log.i(LOG_TAG_ACTIVITY, "on destroy");
 		
+		Globals.tu.interrupt();
 		Globals.tp.interrupt();
 		Globals.tc.setFinishFlag();
 		TrackInfo.destroy();
@@ -300,7 +356,13 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	}
 	
 	@Override
-	public void setPosition(final int position) {	
+	public void setPosition(final int position) {
+		mCurrentPosition = position;
+		
+		if (position<0||position>=mFileList.size()) {
+			return;
+		}
+		
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
@@ -316,13 +378,32 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			@Override
 			public void run() {
 				mAdapter.setTrackList(trackList);
+				setPosition(mCurrentPosition);
 				Globals.tp.setFileList(fileList);
 			}
 		});
 	}
+	
+	@Override
+	public void setCurrentTime(final float currentMs, final float trackLengthMs) {
+		if (trackLengthMs<=0) return;
+		
+		runOnUiThread(new Runnable(){
+			@Override
+			public void run() {
+				int progress = (int)((currentMs*1000)/trackLengthMs);
+				mProgressBar.setProgress(progress);
+			}
+		});
+	}
 
-	private void prepareAndStart() {		
-		Globals.tp = new TransmitterPlayer(mFileList, this);
+	private void prepareAndStart() {	
+		Mp3Decoder decoder = new JLayerMp3Decoder();
+		
+		Globals.tu = new TimeUpdater(this, decoder);
+		Globals.tu.start();
+		
+		Globals.tp = new TransmitterPlayer(mFileList, this, decoder);
 	    Globals.tp.start();
 	    
 	    Globals.tc = new TransmitterController(this);
@@ -415,6 +496,11 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
             	dialog.dismiss();
             	
         		mFileList.remove(position);
+        		if (position<mCurrentPosition) {
+        			mCurrentPosition -=1 ;
+        		} else if (position==mCurrentPosition) {
+        			mCurrentPosition = -1;
+        		}
         		refreshList();
             }
         });
@@ -438,6 +524,7 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
             	dialog.dismiss();
             	
         		mFileList.clear();
+        		mCurrentPosition = -1;
         		refreshList();
             }
         });

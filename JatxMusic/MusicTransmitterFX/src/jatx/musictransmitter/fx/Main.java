@@ -11,6 +11,9 @@
 package jatx.musictransmitter.fx;
 
 import jatx.musiccommons.transmitter.Globals;
+import jatx.musiccommons.transmitter.JLayerMp3Decoder;
+import jatx.musiccommons.transmitter.Mp3Decoder;
+import jatx.musiccommons.transmitter.TimeUpdater;
 import jatx.musiccommons.transmitter.TrackInfo;
 import jatx.musiccommons.transmitter.TransmitterController;
 import jatx.musiccommons.transmitter.TransmitterPlayer;
@@ -44,20 +47,40 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 public class Main extends Application implements UI {
+	public static final String SETTINGS_DIR_PATH;
+	
+	static {
+		String path = System.getProperty("user.home") + File.separator + ".jatxmusic_transmitter";
+		File tmp = new File(path);
+		tmp.mkdirs();
+		
+		if (tmp.exists()) {
+			SETTINGS_DIR_PATH = path;
+		} else {
+			SETTINGS_DIR_PATH = ".";
+		}
+	}
+	
 	private boolean isPlaying = false;
 	private volatile boolean isWifiOk = false;
+	
+	private MenuBar mMenuBar;
 	
 	private ListView<String> mListView;
 	private Button mToogleButton;
 	private Button mDownButton;
 	private Button mUpButton;
 	private Button mWifiButton;
+	private Button mFwdButton;
+	private Button mRevButton;
 	private Label mVolLabel;
+	private ProgressBar mProgressBar;
 	
 	private Stage mStage;
 	
@@ -68,10 +91,13 @@ public class Main extends Application implements UI {
 	
 	private MyList mItems;
 	
+	private int mCurrentPosition = -1;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) {
 		mStage = primaryStage;
+		mStage.setTitle("JatxMusic Transmitter");
 		
 		final Image playImg = new Image("/icons/ic_play.png");
 		final Image pauseImg = new Image("/icons/ic_pause.png");
@@ -86,15 +112,37 @@ public class Main extends Application implements UI {
 			Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
 			Scene scene = new Scene(root);
 			
+			mMenuBar = (MenuBar) scene.lookup("#menu_pane_top");
+			for (final Menu menu: mMenuBar.getMenus()) {
+				for (final MenuItem item: menu.getItems()) {
+					final String itemId = item.getId();
+					
+					item.setOnAction(new EventHandler<ActionEvent>(){
+						@Override
+						public void handle(ActionEvent event) {
+							menuAction(itemId);
+						}
+					});
+				}
+			}
+			
 			mListView = (ListView<String>) scene.lookup("#my_list");
+			mToogleButton = (Button) scene.lookup("#button_toogle");
+			mVolLabel = (Label) scene.lookup("#vol_label");
+			mUpButton = (Button) scene.lookup("#button_up");
+			mDownButton = (Button) scene.lookup("#button_down");
+			mWifiButton = (Button) scene.lookup("#button_wifi");
+			mFwdButton = (Button) scene.lookup("#button_fwd");
+			mRevButton = (Button) scene.lookup("#button_rev");
+			mProgressBar = (ProgressBar) scene.lookup("#progress_bar");
 			
 			mListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 		        @Override
 		        public void handle(MouseEvent click) {
-		        	int pos = mListView.getSelectionModel().getSelectedIndex();
+		        	final int newPosition = mListView.getSelectionModel().getSelectedIndex();
 		        	
 		        	if (click.getClickCount()==2) {
-		        		System.out.println("double click on " + pos);
+		        		System.out.println("double click on " + newPosition);
 		        		
 		        		isPlaying = true;
 		        		
@@ -103,14 +151,55 @@ public class Main extends Application implements UI {
 		        		Globals.tp.play();
 						Globals.tc.play();
 		        		
-		        		Globals.tp.setPosition(pos);
+		        		Globals.tp.setPosition(newPosition);
 		        	} else if (click.getClickCount()==1) {
-		        		System.out.println("single clink on " + pos);
+		        		System.out.println("single clink on " + newPosition);
 		        	}
 		        }
 		    });
 			
-			mToogleButton = (Button) scene.lookup("#button_toogle");
+			mFwdButton.setOnAction(new EventHandler<ActionEvent>(){
+				@Override
+				public void handle(ActionEvent event) {
+					if (mFileList.size()==0) return;
+					
+					final int newPosition = (mCurrentPosition+1)%mFileList.size();
+					
+					isPlaying = true;
+	        		
+	        		mToogleButton.setGraphic(new ImageView(pauseImg));
+	        		
+	        		Globals.tp.play();
+					Globals.tc.play();
+	        		
+	        		Globals.tp.setPosition(newPosition);
+				}
+			});
+			
+			mRevButton.setOnAction(new EventHandler<ActionEvent>(){
+				@Override
+				public void handle(ActionEvent event) {
+					if (mFileList.size()==0) return;
+					
+					final int newPosition;
+					
+					if (mCurrentPosition>0) {
+						newPosition = mCurrentPosition - 1;
+					} else {
+						newPosition = mFileList.size() - 1;
+					}
+					
+					isPlaying = true;
+	        		
+	        		mToogleButton.setGraphic(new ImageView(pauseImg));
+	        		
+	        		Globals.tp.play();
+					Globals.tc.play();
+	        		
+	        		Globals.tp.setPosition(newPosition);
+				}
+			});
+			
 			mToogleButton.setOnAction(new EventHandler<ActionEvent>(){
 				@Override
 				public void handle(ActionEvent event) {
@@ -118,6 +207,14 @@ public class Main extends Application implements UI {
 					System.out.println("toogle: " + isPlaying);
 					
 					if (isPlaying) {
+						if (mFileList.size()==0) {
+							isPlaying = false;
+							return;
+						} else if (mCurrentPosition==-1) {
+							Globals.tp.setPosition(0);
+			        		setPosition(0);
+						}
+						
 						mToogleButton.setGraphic(new ImageView(pauseImg));
 						
 						Globals.tp.play();
@@ -131,9 +228,6 @@ public class Main extends Application implements UI {
 				}
 			});
 			
-			mVolLabel = (Label) scene.lookup("#vol_label");
-					
-			mUpButton = (Button) scene.lookup("#button_up");
 			mUpButton.setOnAction(new EventHandler<ActionEvent>(){
 				@Override
 				public void handle(ActionEvent event) {
@@ -144,7 +238,6 @@ public class Main extends Application implements UI {
 				}
 			});
 			
-			mDownButton = (Button) scene.lookup("#button_down");
 			mDownButton.setOnAction(new EventHandler<ActionEvent>(){
 				@Override
 				public void handle(ActionEvent event) {
@@ -155,26 +248,13 @@ public class Main extends Application implements UI {
 				}
 			});
 			
-			mWifiButton = (Button) scene.lookup("#button_wifi");
-			
-			final MenuBar menuBar = (MenuBar) scene.lookup("#menu_pane_top");
-			for (final Menu menu: menuBar.getMenus()) {
-				for (final MenuItem item: menu.getItems()) {
-					final String itemId = item.getId();
-					
-					item.setOnAction(new EventHandler<ActionEvent>(){
-						@Override
-						public void handle(ActionEvent event) {
-							menuAction(itemId);
-						}
-					});
-				}
-			}
+			mProgressBar.setProgress(0.0);
 			
 			Platform.setImplicitExit(false);			
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			mStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			    @Override
 			    public void handle(WindowEvent event) {
+			    	Globals.tu.interrupt();
 			        Globals.tp.interrupt();
 			        Globals.tc.setFinishFlag();
 			        TrackInfo.destroy();
@@ -185,8 +265,8 @@ public class Main extends Application implements UI {
 			    }
 			});
 			
-			primaryStage.setScene(scene);
-			primaryStage.show();
+			mStage.setScene(scene);
+			mStage.show();
 			
 			prepareAndStart();
 		} catch(Exception e) {
@@ -215,7 +295,14 @@ public class Main extends Application implements UI {
 	}
 	
 	@Override
-	public void setPosition(int position) {
+	public void setPosition(final int position) {
+		System.out.println("current: " + position);
+		
+		mCurrentPosition = position;
+		if (mCurrentPosition<0||mCurrentPosition>=mFileList.size()) {
+			return;
+		}
+		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -232,13 +319,33 @@ public class Main extends Application implements UI {
 			public void run() {
 				mItems = new MyList(trackList);
 				mListView.setItems(mItems);
+				setPosition(mCurrentPosition);
 				Globals.tp.setFileList(fileList);
 			}
 		});
 	}
 	
+	@Override
+	public void setCurrentTime(final float currentMs, final float trackLengthMs) {
+		//System.out.println(currentMs + ", " + trackLengthMs);
+		
+		if (trackLengthMs<=0) return;
+		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				mProgressBar.setProgress(currentMs/trackLengthMs);
+			}
+		});
+	}
+	
 	private void prepareAndStart() {
-		Globals.tp = new TransmitterPlayer(mFileList, this);
+		Mp3Decoder decoder = new JLayerMp3Decoder();
+		
+		Globals.tu = new TimeUpdater(this, decoder);
+		Globals.tu.start();
+		
+		Globals.tp = new TransmitterPlayer(mFileList, this, decoder);
 	    Globals.tp.start();
 	    
 	    Globals.tc = new TransmitterController(this);
@@ -360,16 +467,16 @@ public class Main extends Application implements UI {
 			refreshList();
 		}
 		
-		if (pos<mFileList.size()) {
-			setPosition(pos);
-		} else if (mFileList.size()>0) {
-			setPosition(0);
+		if (pos<mCurrentPosition) {
+			setPosition(mCurrentPosition-1);
+		} else if (pos==mCurrentPosition) {
+			setPosition(-1);
 		}
  	}
 	
 	private void removeAllTracks() {
 		mFileList.clear();
-		
+		setPosition(-1);
 		refreshList();
 	}
 	
@@ -384,7 +491,7 @@ public class Main extends Application implements UI {
 		
 		File f;
 		if (path==null) {
-			f = new File("current.m3u");
+			f = new File(SETTINGS_DIR_PATH + File.separator + "current.m3u");
 		} else {
 			f = new File(path);
 		}
@@ -411,7 +518,7 @@ public class Main extends Application implements UI {
 	private void saveFileList(String path) {
 		File f;
 		if (path==null) {
-			f = new File("current.m3u");
+			f = new File(SETTINGS_DIR_PATH + File.separator + "current.m3u");
 		} else {
 			f = new File(path);
 		}
@@ -435,7 +542,7 @@ public class Main extends Application implements UI {
 		mCurrentListDir = new File(System.getProperty("user.home"));
 		Globals.volume = 100;
 		
-		File f = new File("settings.txt");
+		File f = new File(SETTINGS_DIR_PATH + File.separator + "settings.txt");
 		if (!f.exists()) return;
 		
 		try {
@@ -473,7 +580,7 @@ public class Main extends Application implements UI {
 	}
 	
 	private void saveSettings() {
-		File f = new File("settings.txt");
+		File f = new File(SETTINGS_DIR_PATH + File.separator + "settings.txt");
 		
 		try {
 			PrintWriter pw = new PrintWriter(f);

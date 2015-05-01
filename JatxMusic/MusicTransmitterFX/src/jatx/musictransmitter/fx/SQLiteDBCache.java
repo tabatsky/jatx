@@ -13,6 +13,7 @@ package jatx.musictransmitter.fx;
 import jatx.musiccommons.transmitter.TrackInfo;
 import jatx.musiccommons.transmitter.TrackInfo.DBCache;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,7 +38,8 @@ public class SQLiteDBCache implements DBCache {
 	public SQLiteDBCache() {
 		 try {
 			 Class.forName("org.sqlite.JDBC");
-			 mConnect = DriverManager.getConnection("jdbc:sqlite:musicinfo.db");
+			 mConnect = DriverManager.getConnection("jdbc:sqlite:" 
+					 	+ Main.SETTINGS_DIR_PATH + File.separator + "musicinfo.db");
 			 System.out.println("DB opened successfully");
 			 
 			 Statement st = mConnect.createStatement();

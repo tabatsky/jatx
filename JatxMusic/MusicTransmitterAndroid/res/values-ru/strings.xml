@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="app_name">Music Transmitter</string>
-    
+<resources>    
     <string name="string_add">Добавить</string>
     <string name="string_add_track">Добавить трек</string>
     <string name="string_add_folder">Добавить папку</string>

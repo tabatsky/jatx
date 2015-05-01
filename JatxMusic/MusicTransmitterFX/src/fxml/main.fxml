@@ -38,11 +38,40 @@
 		
 	<ListView id="my_list"></ListView>
     
+    <ProgressBar
+    	id="progress_bar"
+    	/>
+    
     <HBox id="button_pane_bottom">
+    
+    	<Button styleClass="my_button_bottom" id="button_wifi">
+    		<graphic>
+    			<ImageView>
+                	<Image url="/icons/ic_wifi_no.png"/>
+                </ImageView>
+    		</graphic>
+    	</Button>
+        
+    	<Button styleClass="my_button_bottom" id="button_rev">
+    		<graphic>
+    			<ImageView>
+                	<Image url="/icons/ic_rev.png"/>
+                </ImageView>
+    		</graphic>
+    	</Button>
+    	
     	<Button styleClass="my_button_bottom" id="button_toogle">
     		<graphic>
     			<ImageView>
                 	<Image url="/icons/ic_play.png"/>
+                </ImageView>
+    		</graphic>
+    	</Button>
+    	
+    	<Button styleClass="my_button_bottom" id="button_fwd">
+    		<graphic>
+    			<ImageView>
+                	<Image url="/icons/ic_fwd.png"/>
                 </ImageView>
     		</graphic>
     	</Button>
@@ -62,14 +91,6 @@
     		<graphic>
     			<ImageView>
                 	<Image url="/icons/ic_up.png"/>
-                </ImageView>
-    		</graphic>
-    	</Button>
-    	
-    	<Button styleClass="my_button_bottom" id="button_wifi">
-    		<graphic>
-    			<ImageView>
-                	<Image url="/icons/ic_wifi_no.png"/>
                 </ImageView>
     		</graphic>
     	</Button>
