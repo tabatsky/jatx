@@ -16,11 +16,14 @@ import jatx.musiccommons.util.Frame.WrongFrameException;
 import java.io.File;
 
 public abstract class Mp3Decoder {
-	public float currentMs = 0f;
 	public boolean resetTimeFlag = false;
+	public boolean disconnectResetTimeFlag = false;
 	
 	public float msRead = 0f;
 	public float msTotal = 0f;
+	
+	public float currentMs = 0f;
+	public int trackLengthSec = 0;
 	
 	public abstract void setPosition(int position);
 	

@@ -36,6 +36,9 @@ public class TrackInfo {
 	private static volatile boolean pauseFlag = true;
 	private static Object monitor = new Object();
 	
+	private static volatile int dbGetCounter = 0;
+	private static volatile int fileGetCounter = 0;
+	
 	public String path;
 	public String artist = "";
 	public String album = "";
@@ -50,6 +53,9 @@ public class TrackInfo {
 	
 	public static void setFileList(List<File> fileList) {
 		pauseFlag = true;
+		
+		fileGetCounter = 0;
+		dbGetCounter = 0;
 		
 		if (sTagWorker==null) {
 			sTagWorker = new TagWorker();
@@ -120,6 +126,11 @@ public class TrackInfo {
 		if (sDBCache!=null) {
 			info = sDBCache.get(path, lastModified);
 			if (info!=null) {
+				dbGetCounter++;
+				if (dbGetCounter%20==0) {
+					fileGetCounter++;
+				}
+				
 				sMemoryCache.put(path, info);
 				return info;
 			}
@@ -156,6 +167,7 @@ public class TrackInfo {
 			if (sDBCache!=null) {
 				sDBCache.put(info, lastModified);
 			}
+			fileGetCounter++;
 		} catch (Exception e) {}
 		
 		return info;
@@ -190,7 +202,7 @@ public class TrackInfo {
 						continue;
 					}
 					
-					if (current%30==0) {
+					if (fileGetCounter%20==0) {
 						UI ui = sUIRef.get();
 						if (ui!=null) {
 							ui.updateTrackList(sTrackInfoList, sFileList);

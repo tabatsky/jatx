@@ -19,6 +19,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Decoder;
@@ -48,6 +51,15 @@ public class JLayerMp3Decoder extends Mp3Decoder {
 	public synchronized void setFile(File f) throws Mp3DecoderException {
 		if (f==null||!f.exists()) {
 			throw new Mp3DecoderException("File Read Error");
+		}
+		
+		try {
+			AudioFile af;
+			af = AudioFileIO.read(f);
+
+			trackLengthSec = af.getAudioHeader().getTrackLength();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		mDecoder = new Decoder();
@@ -92,6 +104,7 @@ public class JLayerMp3Decoder extends Mp3Decoder {
 			msFrame = frameHeader.ms_per_frame();
 			msRead += msFrame;
 			msTotal += msFrame;
+			currentMs += msFrame;
 				
 			SampleBuffer output = (SampleBuffer) mDecoder.decodeFrame(frameHeader, mBitStream);
 			

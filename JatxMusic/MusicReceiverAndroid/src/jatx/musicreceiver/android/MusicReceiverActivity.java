@@ -15,17 +15,19 @@ import jatx.musiccommons.receiver.ReceiverController;
 import jatx.musiccommons.receiver.ReceiverPlayer;
 import jatx.musiccommons.receiver.UI;
 import jatx.musiccommons.util.Debug;
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MusicReceiverActivity extends Activity implements UI {
+public class MusicReceiverActivity extends ActionBarActivity implements UI {
 	final static String PREFS_NAME = "MusicReceiverPrefsFile";
 	
 	public static final String LOG_TAG_ACTIVITY = "receiver main activity";
@@ -99,6 +101,16 @@ public class MusicReceiverActivity extends Activity implements UI {
 	public void onBackPressed() {
 		 Log.i(LOG_TAG_ACTIVITY, "back pressed");
 		 finish();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
+		return true;
+	} 
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return true;
 	}
 	
 	@Override

@@ -33,11 +33,11 @@ public class TransmitterController extends Thread {
 	volatile boolean finishFlag;
 	volatile BlockingQueue<Byte> fifo;
 	
-	volatile boolean mDisconnectFlag;
+	volatile boolean mForceDisconnectFlag;
 	
 	public TransmitterController(UI ui) {
 		finishFlag = false;
-		mDisconnectFlag = false;
+		mForceDisconnectFlag = false;
 		
 		ref = new WeakReference<UI>(ui);
 		
@@ -49,7 +49,7 @@ public class TransmitterController extends Thread {
 	}
 	
 	public void forceDisconnect() {
-		mDisconnectFlag = true;
+		mForceDisconnectFlag = true;
 	}
 	
 	public void play() {
@@ -85,9 +85,10 @@ public class TransmitterController extends Thread {
 				Thread.sleep(100);
 				
 				ss = new ServerSocket(CONNECT_PORT_CONTROLLER);
+				System.out.println("(controller) new server socket");
 				
 				try {
-					ss.setSoTimeout(1000);
+					ss.setSoTimeout(Globals.SO_TIMEOUT);
 					Socket s = ss.accept();
 					os = s.getOutputStream();
 					
@@ -111,8 +112,9 @@ public class TransmitterController extends Thread {
 						os.flush();
 						Thread.sleep(10);
 						
-						if (mDisconnectFlag) {
-							throw new IOException();
+						if (mForceDisconnectFlag) {
+							System.out.println("(player) disconnect flag: throwing DisconnectException");
+							throw new DisconnectException();
 						}		
 					}
 					
@@ -122,6 +124,13 @@ public class TransmitterController extends Thread {
 					os.flush();
 				} catch (SocketTimeoutException e) {
 					System.err.println("(controller) socket timeout");
+
+					mForceDisconnectFlag = false;
+				} catch (DisconnectException e){
+					System.err.println("(controller) socket force disconnect");
+					System.err.println("(controller) " + (new Date()).getTime()%10000);
+					
+					mForceDisconnectFlag = false;
 				} catch (IOException e) {
 					System.err.println("(controller) socket disconnect");
 					System.err.println("(controller) " + (new Date()).getTime()%10000);
@@ -130,15 +139,17 @@ public class TransmitterController extends Thread {
 					
 					Thread.sleep(250);
 					
-					mDisconnectFlag = false;
+					mForceDisconnectFlag = false;
 				} finally {
 					try {
 						os.close();
+						System.out.println("(controller) outstream closed");
 					} catch (Exception ex) {
 						System.err.println("(controller) cannot close outstream");
 					}
 					try {
 						ss.close();
+						System.out.println("(controller) server socket closed");
 					} catch (Exception ex) {
 						System.err.println("(controller) cannot close server socket");
 					}
@@ -150,11 +161,13 @@ public class TransmitterController extends Thread {
 			System.err.println("(controller) thread interrupted");
 			try {
 				os.close();
+				System.out.println("(controller) outstream closed");
 			} catch (Exception ex) {
 				System.err.println("(controller) cannot close outstream");
 			}
 			try {
 				ss.close();
+				System.out.println("(controller) server socket closed");
 			} catch (Exception ex) {
 				System.err.println("(controller) cannot close server socket");
 			}

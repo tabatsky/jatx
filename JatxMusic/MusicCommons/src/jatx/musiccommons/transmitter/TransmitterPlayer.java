@@ -43,7 +43,7 @@ public class TransmitterPlayer extends Thread {
 	volatile int mPosition;
 	volatile boolean isPlaying;
 	
-	volatile boolean mDisconnectFlag;
+	volatile boolean mForceDisconnectFlag;
 	
 	volatile String mPath;
 	volatile Mp3Decoder mDecoder;
@@ -52,15 +52,15 @@ public class TransmitterPlayer extends Thread {
 	volatile long t2;
 	volatile float dt;
 	
-	public TransmitterPlayer(List<File> fileList, UI ui) {
+	public TransmitterPlayer(List<File> fileList, UI ui, Mp3Decoder decoder) {
 		ref = new WeakReference<UI>(ui);
 		setFileList(fileList);
 		
 		isPlaying = false;
-		mDisconnectFlag = false;
+		mForceDisconnectFlag = false;
 		
 		mPath = "";
-		mDecoder = new JLayerMp3Decoder();
+		mDecoder = decoder;
 	}
 	
 	public void setFileList(List<File> fileList) {
@@ -69,7 +69,7 @@ public class TransmitterPlayer extends Thread {
 	}
 	
 	public void forceDisconnect() {
-		mDisconnectFlag = true;
+		mForceDisconnectFlag = true;
 	}
 	
 	public void play() {
@@ -130,9 +130,10 @@ public class TransmitterPlayer extends Thread {
 				Thread.sleep(100);
 				
 				ss = new ServerSocket(CONNECT_PORT_PLAYER);
+				System.out.println("(player) new server socket");
 				
 				try {
-					ss.setSoTimeout(1000);
+					ss.setSoTimeout(Globals.SO_TIMEOUT);
 					Socket s = ss.accept();
 					os = s.getOutputStream();
 					
@@ -147,6 +148,15 @@ public class TransmitterPlayer extends Thread {
 					translateMusic(os);
 				} catch (SocketTimeoutException e) {
 					System.err.println("(player) socket timeout");
+					
+					mForceDisconnectFlag = false;
+					mDecoder.disconnectResetTimeFlag = true;
+				} catch (DisconnectException e){
+					System.err.println("(player) socket force disconnect");
+					System.err.println("(player) " + (new Date()).getTime()%10000);
+					
+					mForceDisconnectFlag = false;
+					mDecoder.disconnectResetTimeFlag = true;
 				} catch (IOException e) {
 					System.err.println("(player) socket disconnect");
 					System.err.println("(player) " + (new Date()).getTime()%10000);
@@ -155,15 +165,18 @@ public class TransmitterPlayer extends Thread {
 					
 					Thread.sleep(250);
 					
-					mDisconnectFlag = false;
+					mForceDisconnectFlag = false;
+					mDecoder.disconnectResetTimeFlag = true;
 				} finally {
 					try {
 						os.close();
+						System.out.println("(player) outstream closed");
 					} catch (Exception ex) {
 						System.err.println("(player) cannot close outstream");
 					}
 					try {
 						ss.close();
+						System.out.println("(player) server socket closed");
 					} catch (Exception ex) {
 						System.err.println("(player) cannot close server socket");
 					}
@@ -181,11 +194,13 @@ public class TransmitterPlayer extends Thread {
 			System.err.println("(player) thread interrupted");
 			try {
 				os.close();
+				System.out.println("(player) outstream closed");
 			} catch (Exception ex) {
 				System.err.println("(player) cannot close outstream");
 			}
 			try {
 				ss.close();
+				System.out.println("(player) server socket closed");
 			} catch (Exception ex) {
 				System.err.println("(player) cannot close server socket");
 			}
@@ -195,7 +210,7 @@ public class TransmitterPlayer extends Thread {
 	}
 	
 	private void translateMusic(OutputStream os) 
-			throws InterruptedException, IOException {
+			throws InterruptedException, IOException, DisconnectException {
 		byte[] data = null;
 		
 		t1 = (new Date()).getTime();
@@ -205,6 +220,8 @@ public class TransmitterPlayer extends Thread {
 		while (true) {
 			if (isPlaying) {
 				if (mDecoder.resetTimeFlag) {
+					long t2_1 = t2;
+					
 					do {
 						t2 = (new Date()).getTime();
 						dt = mDecoder.msTotal - (t2-t1);
@@ -217,7 +234,19 @@ public class TransmitterPlayer extends Thread {
 					t1 = (new Date()).getTime();
 					t2 = t1;
 					
+					long t2_2 = t2;
+					
+					System.out.println("(player) force delay: " + (t2_2-t2_1));
+					
 					mDecoder.resetTimeFlag = false;
+				}
+				
+				if (mDecoder.disconnectResetTimeFlag) {
+					t1 = (new Date()).getTime();
+					t2 = t1;
+					mDecoder.msRead = 0f;
+					mDecoder.msTotal = 0f;
+					mDecoder.disconnectResetTimeFlag = false;
 				}
 				
 				try {
@@ -250,8 +279,9 @@ public class TransmitterPlayer extends Thread {
 				dt = 0f;
 			}
 			
-			if (mDisconnectFlag) {
-				throw new IOException();
+			if (mForceDisconnectFlag) {
+				System.out.println("(player) disconnect flag: throwing DisconnectException");
+				throw new DisconnectException();
 			}		
 			
 			if (mDecoder.msRead>300) {

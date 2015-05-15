@@ -13,6 +13,9 @@ package jatx.musiccommons.transmitter;
 public class Globals {
 	public static volatile TransmitterController tc;
 	public static volatile TransmitterPlayer tp;
+	public static volatile TimeUpdater tu;
 
 	public static volatile Integer volume = 100;
+	
+	public static final int SO_TIMEOUT = 1000;
 }

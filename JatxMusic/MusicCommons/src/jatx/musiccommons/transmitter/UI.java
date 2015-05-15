@@ -19,4 +19,6 @@ public interface UI {
 	public void setPosition(int position);
 	
 	public void updateTrackList(List<TrackInfo> trackList, List<File> fileList);
+	
+	public void setCurrentTime(float currentMs, float trackLengthMs);
 }

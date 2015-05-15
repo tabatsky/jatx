@@ -30,7 +30,7 @@ public class ReceiverPlayer extends Thread {
 	
 	public static final int FRAME_HEADER_SIZE = 32;
 	
-	public static final int SOCKET_TIMEOUT = 750;
+	public static final int SOCKET_TIMEOUT = 1500;
 	
 	private volatile WeakReference<UI> ref;
 	

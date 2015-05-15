@@ -24,7 +24,7 @@ import java.net.SocketTimeoutException;
 public class ReceiverController extends Thread {
 	public static final int CONNECT_PORT_CONTROLLER = 7172;
 	
-	public static final int SOCKET_TIMEOUT = 750;
+	public static final int SOCKET_TIMEOUT = 1500;
 	
 	public static final byte COMMAND_EMPTY = (byte)255;
 	public static final byte COMMAND_STOP = (byte)127;

@@ -33,7 +33,21 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
 public class Main extends Application implements UI {
-	//private Stage mStage;
+	public static final String SETTINGS_DIR_PATH;
+	
+	static {
+		String path = System.getProperty("user.home") + File.separator + ".jatxmusic_receiver";
+		File tmp = new File(path);
+		tmp.mkdirs();
+		
+		if (tmp.exists()) {
+			SETTINGS_DIR_PATH = path;
+		} else {
+			SETTINGS_DIR_PATH = ".";
+		}
+	}
+	
+	private Stage mStage;
 	
 	private Main self;
 	
@@ -52,7 +66,9 @@ public class Main extends Application implements UI {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		//mStage = primaryStage;
+		mStage = primaryStage;
+		mStage.setTitle("JatxMusic Receiver");
+		
 		self = this;
 		
 		isRunning = false;
@@ -194,7 +210,7 @@ public class Main extends Application implements UI {
 		mHost = "127.0.0.1";
 		mAutoConnect = false;
 		
-		File f = new File("settings.txt");
+		File f = new File(SETTINGS_DIR_PATH + File.separator + "settings.txt");
 		if (!f.exists()) return;
 		
 		try {
@@ -220,7 +236,7 @@ public class Main extends Application implements UI {
 	}
 	
 	private void saveSettings() {
-		File f = new File("settings.txt");
+		File f = new File(SETTINGS_DIR_PATH + File.separator + "settings.txt");
 		
 		try {
 			PrintWriter pw = new PrintWriter(f);
