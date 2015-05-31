@@ -14,7 +14,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -23,7 +22,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
 public class TrackInfo {
-	private static volatile ConcurrentHashMap<String,TrackInfo> sMemoryCache = new ConcurrentHashMap<String,TrackInfo>();
+	//private static volatile ConcurrentHashMap<String,TrackInfo> sMemoryCache = new ConcurrentHashMap<String,TrackInfo>();
 	
 	private static volatile List<File> sFileList = null;
 	private static volatile List<TrackInfo> sTrackInfoList = null;
@@ -34,6 +33,7 @@ public class TrackInfo {
 	private static volatile WeakReference<UI> sUIRef = new WeakReference<UI>(null);
 	
 	private static volatile boolean pauseFlag = true;
+	private static volatile boolean resetFlag = false;
 	private static Object monitor = new Object();
 	
 	private static volatile int dbGetCounter = 0;
@@ -74,6 +74,7 @@ public class TrackInfo {
 		sTrackInfoList = new ArrayList<TrackInfo>();
 		
 		pauseFlag = false;
+		resetFlag = true;
 	}
 	
 	public static void destroy() {
@@ -118,11 +119,14 @@ public class TrackInfo {
 		final String path = f.getAbsolutePath();
 		final long lastModified = f.lastModified();
 		
+		/*
 		TrackInfo info = sMemoryCache.get(path);
 		if (info!=null) {
 			return info;
 		} 
+		*/
 		
+		TrackInfo info = null;
 		if (sDBCache!=null) {
 			info = sDBCache.get(path, lastModified);
 			if (info!=null) {
@@ -131,7 +135,7 @@ public class TrackInfo {
 					fileGetCounter++;
 				}
 				
-				sMemoryCache.put(path, info);
+				//sMemoryCache.put(path, info);
 				return info;
 			}
 		}
@@ -163,7 +167,7 @@ public class TrackInfo {
 				}
 			}
 			
-			sMemoryCache.put(path, info);
+			//sMemoryCache.put(path, info);
 			if (sDBCache!=null) {
 				sDBCache.put(info, lastModified);
 			}
@@ -186,6 +190,12 @@ public class TrackInfo {
 					
 					Thread.sleep(5);
 					
+					if (resetFlag) {
+						current = -1;
+						pauseFlag = false;
+						resetFlag = false;
+					}
+					
 					if (pauseFlag) continue;
 					
 					current++;
@@ -193,6 +203,7 @@ public class TrackInfo {
 					if (sFileList==null||sFileList.size()<=current) {
 						current = -1;
 						pauseFlag = true;
+						resetFlag = false;
 						
 						UI ui = sUIRef.get();
 						if (ui!=null) {

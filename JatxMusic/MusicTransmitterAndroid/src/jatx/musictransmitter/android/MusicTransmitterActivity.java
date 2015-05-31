@@ -61,8 +61,9 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	private static final int REQUEST_OPEN_DIR = 502;
 	private static final int REQUEST_EXPORT_LIST = 503;
 	private static final int REQUEST_IMPORT_LIST = 504;
+	public static final int REQUEST_EDIT_TRACK = 505;
 	
-	private List<File> mFileList;
+	List<File> mFileList;
 	private TrackListAdapter mAdapter;
 	
 	private File mCurrentMusicDir;
@@ -85,12 +86,16 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	
 	private int mCurrentPosition = -1;
 	
+	private MusicTransmitterActivity self;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_music_transmitter);
 		
 		Debug.setCustomExceptionHandler(getExternalFilesDir(null));
+		
+		self = this;
 		
 		Log.i(LOG_TAG_ACTIVITY, "on create");
 		
@@ -132,7 +137,11 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				removeTrack(position);
+				//removeTrack(position);
+				
+				TrackLongTapDialog dialog =
+						TrackLongTapDialog.newInstance(self, position);
+				dialog.show(getSupportFragmentManager(), "dialog");
 				
 				return true;
 			}
@@ -305,6 +314,13 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode!=RESULT_OK) return;
 		
+		if (requestCode==REQUEST_EDIT_TRACK&&resultCode==RESULT_OK) {
+			System.out.println("result edit track");
+			
+			refreshList();
+			return;
+		}
+		
 		String filePath = "";
         
         Bundle bundle = data.getExtras();
@@ -329,7 +345,7 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			exportM3U8(f);
 		} else if (requestCode==REQUEST_IMPORT_LIST&&resultCode==RESULT_OK) {
 			importM3U8(f);
-		}
+		} 
 		
 	}
 	
@@ -393,6 +409,17 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 			public void run() {
 				int progress = (int)((currentMs*1000)/trackLengthMs);
 				mProgressBar.setProgress(progress);
+			}
+		});
+	}
+	
+	@Override
+	public void forcePause() {
+		runOnUiThread(new Runnable(){
+			@Override
+			public void run() {
+				mPauseButton.setVisibility(View.GONE);
+				mPlayButton.setVisibility(View.VISIBLE);
 			}
 		});
 	}
@@ -485,8 +512,9 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 		}
 	}
 	
-	private void removeTrack(final int position) {
-		final AlertDialog dialog = new AlertDialog.Builder(this).create();
+	void removeTrack(final int position) {
+		/*
+		 * final AlertDialog dialog = new AlertDialog.Builder(this).create();
 		dialog.setTitle(getString(R.string.string_remove));
         dialog.setMessage(getString(R.string.question_remove_track));
         dialog.setCancelable(false);
@@ -494,14 +522,6 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
         		new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int buttonId) {
             	dialog.dismiss();
-            	
-        		mFileList.remove(position);
-        		if (position<mCurrentPosition) {
-        			mCurrentPosition -=1 ;
-        		} else if (position==mCurrentPosition) {
-        			mCurrentPosition = -1;
-        		}
-        		refreshList();
             }
         });
         dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.no), 
@@ -511,11 +531,20 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
             }
         });
         dialog.show();
+        */
+		
+		mFileList.remove(position);
+		if (position<mCurrentPosition) {
+			mCurrentPosition -=1 ;
+		} else if (position==mCurrentPosition) {
+			mCurrentPosition = -1;
+		}
+		refreshList();
 	}
 	
 	private void removeAllTracks() {
 		final AlertDialog dialog = new AlertDialog.Builder(this).create();
-		dialog.setTitle(getString(R.string.string_remove));
+		dialog.setTitle(getString(R.string.string_remove_all));
         dialog.setMessage(getString(R.string.question_remove_all));
         dialog.setCancelable(false);
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.yes), 

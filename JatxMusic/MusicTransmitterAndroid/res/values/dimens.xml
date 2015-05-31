@@ -12,6 +12,10 @@
     <dimen name="volume_label_text">22dp</dimen>
     <dimen name="song_label_text">14dp</dimen>
     
+    <dimen name="dialog_button_text">20dp</dimen>
+    
+    <dimen name="editor_text">18dp</dimen>
+    
     <dimen name="song_entry_title">20dp</dimen>
     <dimen name="song_entry_artist">15dp</dimen>
     

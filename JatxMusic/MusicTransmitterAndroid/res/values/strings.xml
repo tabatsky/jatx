@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">JatxMusic Transmitter</string>
+	<string name="title_tag_editor">Tag Editor</string>
     
     <string name="string_add">Add</string>
     <string name="string_add_track">Add Track</string>
@@ -16,9 +17,22 @@
 	<string name="question_remove_track">Remove This Track?</string>
 	<string name="question_remove_all">Remove All Tracks?</string>
 	
+	<string name="dialog_track_title">Choose Action</string>
+	<string name="button_remove_this_track">Remove This Track</string>
+	<string name="button_open_tag_editor">Open Tag Editor</string>
+	<string name="button_cancel">Cancel</string>
+	
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	
 	<string name="toast_m3u8_ext">Playlist file must have m3u8 extension</string>
 	<string name="toast_long_tap">Make long tap on track to remove</string>
+	
+	<string name="editor_file">File:</string>
+	<string name="editor_title">Title:</string>
+	<string name="editor_album">Album:</string>
+	<string name="editor_artist">Artist:</string>
+	<string name="editor_number">Number:</string>
+	<string name="editor_year">Year:</string>
+	<string name="editor_save">Save</string>
 </resources>

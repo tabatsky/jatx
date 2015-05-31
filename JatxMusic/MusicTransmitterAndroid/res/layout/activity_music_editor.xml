@@ -1,0 +1,234 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white" >
+
+	
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+    
+    <TextView
+        android:id="@+id/file_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        />
+	
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/editor_title" 
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+    
+    <EditText
+        android:id="@+id/edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/editor_album" 
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+    
+    <EditText
+        android:id="@+id/edit_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/editor_artist"
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+    
+    <EditText
+        android:id="@+id/edit_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/editor_text"
+        android:textColor="@color/black"
+        />
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="horizontal"
+        >
+    	
+        <TextView
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:text="@string/editor_number"
+        	android:textSize="@dimen/editor_text"
+        	android:textColor="@color/black"
+        	android:gravity="center"
+        	/>
+    
+    	<EditText
+        	android:id="@+id/edit_number"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:textSize="@dimen/editor_text"
+        	android:textColor="@color/black"
+        	android:inputType="number"
+        	/>
+    	
+    	<TextView
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:text="@string/editor_year"
+        	android:textSize="@dimen/editor_text"
+        	android:textColor="@color/black"
+        	android:gravity="center"
+        	/>
+    
+    	<EditText
+        	android:id="@+id/edit_year"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:textSize="@dimen/editor_text"
+        	android:textColor="@color/black"
+        	android:inputType="number"
+        	/>
+    </LinearLayout>
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="horizontal"
+        >
+    	<View
+    	    android:layout_width="0dp"
+    	    android:layout_height="fill_parent"
+    	    android:layout_weight="1"
+    	    />
+        
+    	<Button
+        	android:id="@+id/win_to_utf_button"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="5"
+        	android:textSize="@dimen/editor_text"
+        	android:textColor="@color/black"
+        	android:text="CP-1251 to UTF-8"
+        	/>
+    
+    	<View
+    	    android:layout_width="0dp"
+    	    android:layout_height="fill_parent"
+    	    android:layout_weight="1"
+    	    />
+    </LinearLayout>
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="horizontal"
+        >
+    	<View
+    	    android:layout_width="0dp"
+    	    android:layout_height="fill_parent"
+    	    android:layout_weight="1"
+    	    />
+        
+    	<Button
+        	android:id="@+id/save_button"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="5"
+        	android:textSize="@dimen/editor_text"
+        	android:textColor="@color/black"
+        	android:text="@string/editor_save"
+        	/>
+    
+    	<View
+    	    android:layout_width="0dp"
+    	    android:layout_height="fill_parent"
+    	    android:layout_weight="1"
+    	    />
+    </LinearLayout>
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
+</LinearLayout>

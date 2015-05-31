@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>    
+    
+    <string name="app_name">JatxMusic Transmitter</string>
+	<string name="title_tag_editor">Редактор тегов</string>
+	
     <string name="string_add">Добавить</string>
     <string name="string_add_track">Добавить трек</string>
     <string name="string_add_folder">Добавить папку</string>
@@ -13,10 +17,23 @@
 	<string name="question_remove_track">Удалить этот трек?</string>
 	<string name="question_remove_all">Удалить все треки?</string>
 	
+	<string name="dialog_track_title">Выберите действие</string>
+	<string name="button_remove_this_track">Удалить этот трек</string>
+	<string name="button_open_tag_editor">Открыть редактор тегов</string>
+	<string name="button_cancel">Отмена</string>
+	
 	<string name="yes">Да</string>
 	<string name="no">Нет</string>
 	
 	<string name="toast_m3u8_ext">Файл должен иметь расширение m3u8</string>
 	<string name="toast_long_tap">Сделайте долгое нажатие на треке, чтобы удалить</string>
+	
+	<string name="editor_file">Файл:</string>
+	<string name="editor_title">Название:</string>
+	<string name="editor_album">Альбом:</string>
+	<string name="editor_artist">Исполнитель:</string>
+	<string name="editor_number">Номер:</string>
+	<string name="editor_year">Год:</string>
+	<string name="editor_save">Сохранить</string>
 </resources>
 

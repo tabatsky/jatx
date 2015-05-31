@@ -21,4 +21,6 @@ public interface UI {
 	public void updateTrackList(List<TrackInfo> trackList, List<File> fileList);
 	
 	public void setCurrentTime(float currentMs, float trackLengthMs);
+	
+	public void forcePause();
 }

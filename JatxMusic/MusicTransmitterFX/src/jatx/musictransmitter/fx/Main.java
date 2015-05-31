@@ -55,6 +55,9 @@ import javafx.scene.input.MouseEvent;
 public class Main extends Application implements UI {
 	public static final String SETTINGS_DIR_PATH;
 	
+	private static Image playImg;
+	private static Image pauseImg;
+	
 	static {
 		String path = System.getProperty("user.home") + File.separator + ".jatxmusic_transmitter";
 		File tmp = new File(path);
@@ -67,7 +70,7 @@ public class Main extends Application implements UI {
 		}
 	}
 	
-	private boolean isPlaying = false;
+	private volatile boolean isPlaying = false;
 	private volatile boolean isWifiOk = false;
 	
 	private MenuBar mMenuBar;
@@ -99,8 +102,8 @@ public class Main extends Application implements UI {
 		mStage = primaryStage;
 		mStage.setTitle("JatxMusic Transmitter");
 		
-		final Image playImg = new Image("/icons/ic_play.png");
-		final Image pauseImg = new Image("/icons/ic_pause.png");
+		playImg = new Image("/icons/ic_play.png");
+		pauseImg = new Image("/icons/ic_pause.png");
 		
 		TrackInfo.setDBCache(new SQLiteDBCache());
 		TrackInfo.setUI(this);
@@ -338,6 +341,19 @@ public class Main extends Application implements UI {
 			}
 		});
 	}
+	
+	@Override
+	public void forcePause() {
+		isPlaying = false;
+		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				mToogleButton.setGraphic(new ImageView(playImg));
+			}
+		});
+	}
+
 	
 	private void prepareAndStart() {
 		Mp3Decoder decoder = new JLayerMp3Decoder();

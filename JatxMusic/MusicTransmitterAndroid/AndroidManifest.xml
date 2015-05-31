@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jatx.musictransmitter.android"
-    android:versionCode="4"
-    android:versionName="1.0beta3" >
+    android:versionCode="5"
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -27,6 +27,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MusicEditorActivity"
+            android:screenOrientation="portrait" >
         </activity>
        	<activity android:name="ar.com.daidalos.afiledialog.FileChooserActivity" />
     </application>

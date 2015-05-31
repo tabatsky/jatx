@@ -82,6 +82,18 @@ public class TransmitterPlayer extends Thread {
 		isPlaying = false;
 	}
 	
+	private void forcePause() {
+		System.out.println("(player) force pause");
+		isPlaying = false;
+		
+		Globals.tc.pause();
+		
+		final UI ui = ref.get();
+		if (ui!=null) {
+			ui.forcePause();
+		}
+	}
+	
 	public void setPosition(final int position) {		
 		pause();
 		
@@ -112,12 +124,16 @@ public class TransmitterPlayer extends Thread {
 		}
 		
 		play();
-
 	}
 	
 	public void nextTrack() {
-		final int pos = (mPosition+1)%mCount;
-		setPosition(pos);
+		try {
+			final int pos = (mPosition+1)%mCount;
+			setPosition(pos);
+		} catch (Exception e) {
+			e.printStackTrace();
+			forcePause();
+		}
 	}
 	
 	@Override
