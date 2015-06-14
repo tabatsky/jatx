@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Bundle;
@@ -279,7 +280,7 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle presses on the action bar items
 		
-	    switch (item.getItemId()) {
+		switch (item.getItemId()) {
 	        case R.id.item_menu_add_track:
 	        	openMP3File(null);
 	        	return true;
@@ -304,8 +305,42 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	        	importM3U8(null);
 	        	return true;
 	        	
-	        default:
+	        case R.id.item_review_app:
+	        	try {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("market://details?id=jatx.musictransmitter.android")));
+				} catch (android.content.ActivityNotFoundException anfe) {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://play.google.com/store/apps/details?id=jatx.musictransmitter.android")));
+				}
+	        	return true;
+	        
+	        case R.id.item_receiver_android:
+	        	try {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("market://details?id=jatx.musicreceiver.android")));
+				} catch (android.content.ActivityNotFoundException anfe) {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://play.google.com/store/apps/details?id=jatx.musicreceiver.android")));
+				}
+	        	return true;
 	        	
+	        case R.id.item_javafx_version:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://yadi.sk/d/T2QKUqOGgxKR8")));
+	        	return true;
+	        
+	        case R.id.item_source_code:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://github.com/tabatsky/jatx/tree/master/JatxMusic")));
+	        	return true;
+	        	
+	        case R.id.item_dev_site:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("http://tabatsky.ru")));
+	        	return true;
+	        
+	        default:
 	        	return false;
 	    }
 	}

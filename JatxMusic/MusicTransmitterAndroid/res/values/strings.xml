@@ -35,4 +35,10 @@
 	<string name="editor_number">Number:</string>
 	<string name="editor_year">Year:</string>
 	<string name="editor_save">Save</string>
+	
+	<string name="item_review_app">Review App</string>
+	<string name="item_receiver_android">Receiver for Android</string>
+	<string name="item_javafx_version">Version for JavaFX</string>
+	<string name="item_source_code">Source Code</string>
+	<string name="item_dev_site">Developer Site</string>
 </resources>
