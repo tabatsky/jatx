@@ -39,6 +39,8 @@
 	<string name="item_review_app">Оценить приложение</string>
 	<string name="item_receiver_android">Приемник для Android</string>
 	<string name="item_javafx_version">Версия для JavaFX</string>
+	<string name="item_receiver_javafx">Приемник для JavaFX</string>
+	<string name="item_transmitter_javafx">Передатчик для JavaFX</string>
 	<string name="item_source_code">Исходный код</string>
 	<string name="item_dev_site">Сайт разработчика</string>
 </resources>

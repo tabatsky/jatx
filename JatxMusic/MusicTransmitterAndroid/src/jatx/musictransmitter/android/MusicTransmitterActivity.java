@@ -234,7 +234,7 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 	    mProgressBar.setProgress(0);
 
 		mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		mLock = mWifiManager.createWifiLock("music transmitter wifi lock");
+		mLock = mWifiManager.createWifiLock("music-transmitter-wifi-lock");
 		mLock.setReferenceCounted(false);
 		mLock.acquire();
 		
@@ -325,9 +325,21 @@ public class MusicTransmitterActivity extends ActionBarActivity implements UI {
 				}
 	        	return true;
 	        	
+	        /*
 	        case R.id.item_javafx_version:
 	        	startActivity(new Intent(Intent.ACTION_VIEW, 
 			    		Uri.parse("https://yadi.sk/d/T2QKUqOGgxKR8")));
+	        	return true;
+	        */
+	        	
+	        case R.id.item_receiver_javafx:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://yadi.sk/d/mUHvCxcchFZ7s")));
+	        	return true;
+	        
+	        case R.id.item_transmitter_javafx:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://yadi.sk/d/9vBoZFZVhFZ7D")));
 	        	return true;
 	        
 	        case R.id.item_source_code:

@@ -10,16 +10,25 @@
  ******************************************************************************/
 package jatx.musicreceiver.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jatx.musiccommons.receiver.AutoConnectThread;
 import jatx.musiccommons.receiver.ReceiverController;
 import jatx.musiccommons.receiver.ReceiverPlayer;
 import jatx.musiccommons.receiver.UI;
 import jatx.musiccommons.util.Debug;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +38,8 @@ import android.widget.Toast;
 
 public class MusicReceiverActivity extends ActionBarActivity implements UI {
 	final static String PREFS_NAME = "MusicReceiverPrefsFile";
+
+	final static String DELIM = "#13731#";
 	
 	public static final String LOG_TAG_ACTIVITY = "receiver main activity";
 	
@@ -40,12 +51,17 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 	
 	private boolean isRunning;
 	
-	private boolean mAutoConnect;
-	private String mHost;
+	public boolean autoConnect;
+	public String host;
+	public List<String> allHosts;
+	int hostIndex;
 	
-	private EditText mHostField;
+	private EditText hostField;
 	private Button mToogleButton;
 	private CheckBox mAutoCheckBox;
+	
+	private volatile WifiManager mWifiManager;
+	private volatile WifiLock mLock;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +74,7 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 				
 		isRunning = false;
 		
-		mHostField = (EditText) findViewById(R.id.hostname);
+		hostField = (EditText) findViewById(R.id.hostname);
 		mToogleButton = (Button)findViewById(R.id.toogle);
 		mAutoCheckBox = (CheckBox)findViewById(R.id.auto_connect);
 		
@@ -76,12 +92,20 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 		mAutoCheckBox.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mAutoConnect = mAutoCheckBox.isChecked();
+				autoConnect = mAutoCheckBox.isChecked();
 				saveSettings();
 			}
 		});
 		
-		prepareAndStart();
+		//prepareAndStart();
+		
+		SelectHostDialog dialog = SelectHostDialog.newInstance(this);
+		dialog.show(getSupportFragmentManager(), "select-host-dialog");
+		
+		mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		mLock = mWifiManager.createWifiLock("music-receiver-wifi-lock");
+		mLock.setReferenceCounted(false);
+		mLock.acquire();
 	}
 	
 	@Override
@@ -91,6 +115,8 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 		if (act!=null) {
 			act.interrupt();
 		}
+		
+		mLock.release();
 		
 		stopJob();
 		
@@ -105,12 +131,66 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		return true;
+		MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu_music_receiver, menu);
+	    return super.onCreateOptionsMenu(menu);
 	} 
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		return true;
+		// Handle presses on the action bar items
+		
+		switch (item.getItemId()) {
+	        case R.id.item_review_app:
+	        	try {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("market://details?id=jatx.musicreceiver.android")));
+				} catch (android.content.ActivityNotFoundException anfe) {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://play.google.com/store/apps/details?id=jatx.musicreceiver.android")));
+				}
+	        	return true;
+	        
+	        case R.id.item_transmitter_android:
+	        	try {
+			    	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("market://details?id=jatx.musictransmitter.android")));
+				} catch (android.content.ActivityNotFoundException anfe) {
+			    	startActivity(new Intent(Intent.ACTION_VIEW,
+			    			Uri.parse("https://play.google.com/store/apps/details?id=jatx.musictransmitter.android")));
+				}
+	        	return true;
+	        	
+	        /*
+	        case R.id.item_javafx_version:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://yadi.sk/d/T2QKUqOGgxKR8")));
+	        	return true;
+	        */
+	        
+	        case R.id.item_receiver_javafx:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://yadi.sk/d/mUHvCxcchFZ7s")));
+	        	return true;
+	        
+	        case R.id.item_transmitter_javafx:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://yadi.sk/d/9vBoZFZVhFZ7D")));
+	        	return true;
+	        	
+	        case R.id.item_source_code:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("https://github.com/tabatsky/jatx/tree/master/JatxMusic")));
+	        	return true;
+	        	
+	        case R.id.item_dev_site:
+	        	startActivity(new Intent(Intent.ACTION_VIEW, 
+			    		Uri.parse("http://tabatsky.ru")));
+	        	return true;
+	        
+	        default:
+	        	return false;
+	    }
 	}
 	
 	@Override
@@ -122,10 +202,10 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 				isRunning = true;
 				Log.i(LOG_TAG_ACTIVITY, "start job");		
 				mToogleButton.setText(getString(R.string.string_stop));
-				mHost = mHostField.getText().toString();
+				host = hostField.getText().toString();
 				saveSettings();
-				rp = new ReceiverPlayer(mHost, self, new AndroidSoundOut());
-				rc = new ReceiverController(mHost, self);
+				rp = new ReceiverPlayer(host, self, new AndroidSoundOut());
+				rc = new ReceiverController(host, self);
 				rp.start();
 				rc.start();
 			}
@@ -178,34 +258,57 @@ public class MusicReceiverActivity extends ActionBarActivity implements UI {
 		});		
 	}
 	
-	private void prepareAndStart() {
-		loadSettings();
+	public void prepareAndStart() {
+		//loadSettings();
 		
-		mHostField.setText(mHost);
-		mAutoCheckBox.setChecked(mAutoConnect);
+		hostField.setText(host);
+		mAutoCheckBox.setChecked(autoConnect);
 		
 		act = new AutoConnectThread(this);
 		act.start();
 	}
 	
-	private void loadSettings() {
+	public void loadSettings() {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		mHost = settings.getString("IP", "127.0.0.1");
-		mAutoConnect = settings.getBoolean("autoConnect", false);
+	
+		String allHostsStr = settings.getString("all_IP", "New Transmitter" + DELIM + "127.0.0.1");
+		String[] allHostsArr = allHostsStr.split(DELIM);
+		
+		allHosts = new ArrayList<String>();
+		for (int i=0; i<allHostsArr.length; i++) {
+			allHosts.add(allHostsArr[i]);
+		}
+		
+		host = settings.getString("IP", "127.0.0.1");
+		
+		hostIndex = allHosts.indexOf(host);
+		
+		Log.i("all hosts", allHostsStr);
+		Log.i("host index", Integer.toString(hostIndex));
+		
+		autoConnect = settings.getBoolean("autoConnect", false);
 	}
 	
-	private void saveSettings() {
+	public void saveSettings() {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		
-		editor.putBoolean("autoConnect", mAutoConnect);
-		editor.putString("IP", mHost);
+		editor.putBoolean("autoConnect", autoConnect);
+		editor.putString("IP", host);
+		
+		StringBuilder allHostsBuilder = new StringBuilder();
+		allHostsBuilder.append(allHosts.get(0));
+		for (int i=1; i<allHosts.size(); i++) {
+			allHostsBuilder.append(DELIM);
+			allHostsBuilder.append(allHosts.get(i));
+		}
+		editor.putString("all_IP", allHostsBuilder.toString());
 		
 		editor.commit();
 	}
 
 	@Override
 	public boolean isAutoConnect() {
-		return mAutoConnect;
+		return autoConnect;
 	}
 }
