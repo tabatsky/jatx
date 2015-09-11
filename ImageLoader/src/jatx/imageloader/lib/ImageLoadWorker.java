@@ -16,17 +16,17 @@ public class ImageLoadWorker extends Thread {
 		try {
 			while (true) {
 				try {
-					ImageEntry imgEntry = ImageLoader.getQueue().getNextEntry();
+					final ImageEntry imgEntry = ImageLoader.getQueue().getNextEntry();
 				
 					Bitmap bmp = null;
 					try {
 						bmp = ImageLoader.getCache().getBmp(imgEntry.getUrl());
 					} catch (BitmapNotCachedException e) {
-						e.printStackTrace();
+						//e.printStackTrace();
 						try {
 							bmp = NetworkingBitmapDownloader.downloadBmp(imgEntry.getUrl());
 						} catch (CannotDownloadBitmapException e1) {
-							e1.printStackTrace();
+							//e1.printStackTrace();
 						}
 					}
 					
@@ -54,8 +54,18 @@ public class ImageLoadWorker extends Thread {
 								lp.height = (ImageLoader.getScreenWidth() * H) / W;
 								imgView.setLayoutParams(lp);
 								
+								if (bmpFinal.isRecycled()) {
+									try {
+										ImageLoader.getQueue().putEntry(imgEntry);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+									return;
+								}
+								
 								imgView.setImageBitmap(bmpFinal);
 								imgView.setVisibility(View.VISIBLE);
+								//bmpFinal.recycle();
 							}
 						});
 					} catch (ImageViewNotAliveException e) {

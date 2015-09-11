@@ -16,10 +16,11 @@ public class NetworkingBitmapDownloader {
 			_url = new URL(url);
 			bmp = BitmapFactory.decodeStream(_url.openConnection().getInputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e("download failed", url);
 			throw new CannotDownloadBitmapException();
 		}
 		if (bmp==null) {
+			Log.e("download failed", url);
 			throw new CannotDownloadBitmapException();
 		} else {
 			Log.i("success download", url);

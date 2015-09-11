@@ -15,7 +15,7 @@ import android.util.Log;
 import android.widget.ListView;
 
 public class TestActivity extends Activity {
-	public static final int THREAD_COUNT = 4;
+	public static final int THREAD_COUNT = 8;
 	
 	static long cacheMem;
 	static int screenWidth;
@@ -35,7 +35,7 @@ public class TestActivity extends Activity {
 		Thread.setDefaultUncaughtExceptionHandler(customUEH);
 		
 		Runtime info = Runtime.getRuntime();
-		cacheMem = info.freeMemory()/4;
+		cacheMem = info.freeMemory()/2;
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
