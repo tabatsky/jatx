@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="black" type="color">#FF000000</item>
-    <item name="white" type="color">#FFFFFFFF</item>
-    <item name="grayC" type="color">#FFCCCCCC</item>
-    <item name="grayE" type="color">#FFEEEEEE</item>
-</resources>

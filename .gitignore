@@ -1,0 +1,8 @@
+bin
+gen
+/JatxMusic/MusicTransmitterFX/settings.txt
+/JatxMusic/MusicTransmitterFX/current.m3u
+/JatxMusic/MusicTransmitterFX/musicinfo.db
+/JatxMusic/MusicReceiverFX/settings.txt
+/JatxMusic/MusicTransmitterAndroid/keystore
+/JatxMusic/MusicReceiverAndroid/keystore
